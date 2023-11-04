@@ -33,9 +33,7 @@ private:
 
     static bool canAddVertex(const Node& currentNode, int i);
     static int calculateCost(Graph& graph, const Node& currentNode, int i);
-    void search();
-    void bound();
-    Graph relax(Graph& graph, int& lowerBound);
+    void relax(Graph& graph, int& lowerBound);
 };
 
 

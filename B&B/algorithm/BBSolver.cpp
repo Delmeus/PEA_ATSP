@@ -12,7 +12,7 @@ void BBSolver::solve(Graph& graph, int city) {
     int lowerBound = 0;
     int bestCost = INT_MAX;
     timer.start();
-    Graph g1 = relax(graph, lowerBound);
+    relax(graph, lowerBound);
     /*
      * Queue to store possible paths
      */
@@ -42,6 +42,11 @@ void BBSolver::solve(Graph& graph, int city) {
          * the previous ones
          */
         if (currentNode.path.size() == graph.vertices) {
+            /*
+             * return to origin
+             */
+            currentNode.cost += graph.edges[currentNode.path.back()][city];
+            //currentNode.path.push_back(city);
             if (currentNode.cost < bestCost) {
                 bestCost = currentNode.cost;
                 bestPath = currentNode.path;
@@ -70,14 +75,14 @@ void BBSolver::solve(Graph& graph, int city) {
         }
     }
     timer.stop();
-    cout << "Time needed to complete " << timer.mili() << " ms" << endl;
+    cout << "Time needed to complete " << timer.mili() << " ms " << timer.micro() << " microseconds" << endl;
     cout << "Best cost: " << bestCost + lowerBound << endl;
     for(auto element : bestPath)
         cout << element << " -> ";
     cout << city << endl;
 }
 
-Graph BBSolver::relax(Graph& graph, int& lowerBound) {
+void BBSolver::relax(Graph& graph, int& lowerBound) {
 
     int highest = 0, column = 0;
     int x, y;
@@ -93,12 +98,13 @@ Graph BBSolver::relax(Graph& graph, int& lowerBound) {
             }
 
         }
-
+/*
         if(smallest > highest) {
             highest = smallest;
             x = i;
             y = column;
         }
+        */
 
         lowerBound += smallest;
         /*
@@ -135,7 +141,7 @@ Graph BBSolver::relax(Graph& graph, int& lowerBound) {
         }
 
         if(row != -1) {
-
+/*
             if(smallest > highest) {
                 highest = smallest;
                 x = row;
@@ -159,7 +165,7 @@ Graph BBSolver::relax(Graph& graph, int& lowerBound) {
     Graph reducedMatrix(graph.vertices - 1);
     /*
      *  create matrix without row x and column y
-     */
+
     for(int i = 0; i < graph.vertices; i++){
 
         if(i == x)
@@ -184,7 +190,7 @@ Graph BBSolver::relax(Graph& graph, int& lowerBound) {
             }
         }
     }
-    return reducedMatrix;
+    */
 }
 
 bool BBSolver::canAddVertex(const BBSolver::Node &currentNode, int i) {
