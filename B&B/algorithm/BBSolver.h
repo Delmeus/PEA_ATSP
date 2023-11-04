@@ -11,8 +11,10 @@
 #include "../utils/Timer.h"
 
 class BBSolver {
+
 public:
-    void solve(Graph& graph, int city);
+    long solveBFS(Graph& graph, int city);
+    long solveDFS(Graph& graph, int city);
 
 private:
     Timer timer;
@@ -33,7 +35,7 @@ private:
 
     static bool canAddVertex(const Node& currentNode, int i);
     static int calculateCost(Graph& graph, const Node& currentNode, int i);
-    void relax(Graph& graph, int& lowerBound);
+    static void relax(Graph& graph, int& lowerBound);
 };
 
 
