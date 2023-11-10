@@ -8,7 +8,7 @@
 
 class AutomaticTester {
 public:
-    static void test();
+    static void test(int size);
 };
 
 

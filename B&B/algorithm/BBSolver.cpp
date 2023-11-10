@@ -29,7 +29,10 @@ long BBSolver::solveBFS(Graph& graph, int city) {
 
     while(!nodeQueue.empty()) {
         timer.stop();
-        if(timer.mili() > 5000*60) {
+        /*
+         * if search takes more than 2 minutes stop algorithm
+         */
+        if(timer.mili() > 2000 * 60) {
             cout << "Time limit reached!" << endl;
             break;
         }
@@ -63,7 +66,7 @@ long BBSolver::solveBFS(Graph& graph, int city) {
                  */
                 std::vector<int> newPath = currentNode.path;
                 newPath.push_back(i);
-                int newCost = calculateCost(graph, currentNode, i);
+                int newCost = currentNode.cost + graph.edges[currentNode.path.back()][i];
                 /*
                  * add node to queue only when it has a chance to be a better solution
                  */
@@ -76,10 +79,12 @@ long BBSolver::solveBFS(Graph& graph, int city) {
     }
     timer.stop();
     cout << "Time needed to complete " << timer.mili() << " ms " << timer.micro() << " microseconds" << endl;
-    cout << "Best cost: " << bestCost + lowerBound << endl;
-    for(auto element : bestPath)
-        cout << element << " -> ";
-    cout << city << endl;
+    if(bestCost != INT_MAX) {
+        cout << "Best cost: " << bestCost + lowerBound << endl << "Path length: " << bestPath.size() + 1 << endl;
+        for (auto element: bestPath)
+            cout << element << " -> ";
+        cout << city << endl;
+    }
 
     return timer.micro();
 }
@@ -101,7 +106,10 @@ long BBSolver::solveDFS(Graph &graph, int city) {
 
     while (!nodeStack.empty()) {
         timer.stop();
-        if (timer.mili() > 5000 * 60) {
+        /*
+         * if search takes more than 2 minutes stop algorithm
+         */
+        if (timer.mili() > 2000 * 60) {
             cout << "Time limit reached!" << endl;
             break;
         }
@@ -127,7 +135,7 @@ long BBSolver::solveDFS(Graph &graph, int city) {
             if (canAddVertex(currentNode, i)) {
                 std::vector<int> newPath = currentNode.path;
                 newPath.push_back(i);
-                int newCost = calculateCost(graph, currentNode, i);
+                int newCost = currentNode.cost + graph.edges[currentNode.path.back()][i];
 
                 if (newCost < bestCost) {
                     Node newNode(newPath, newCost);
@@ -139,10 +147,12 @@ long BBSolver::solveDFS(Graph &graph, int city) {
 
     timer.stop();
     cout << "Time needed to complete " << timer.mili() << " ms " << timer.micro() << " microseconds" << endl;
-    cout << "Best cost: " << bestCost + lowerBound << endl;
-    for (auto element : bestPath)
-        cout << element << " -> ";
-    cout << city << endl;
+    if(bestCost != INT_MAX) {
+        cout << "Best cost: " << bestCost + lowerBound << endl << "Path length: " << bestPath.size() + 1 << endl;
+        for (auto element: bestPath)
+            cout << element << " -> ";
+        cout << city << endl;
+    }
 
     return timer.micro();
 }
@@ -156,7 +166,6 @@ void BBSolver::relax(Graph& graph, int& lowerBound) {
         for(int j = 0; j < graph.vertices; j++){
             if(graph.edges[i][j] < smallest && i != j) {
                 smallest = graph.edges[i][j];
-                //column = j;
             }
 
         }
@@ -213,17 +222,8 @@ void BBSolver::relax(Graph& graph, int& lowerBound) {
 
 bool BBSolver::canAddVertex(const BBSolver::Node &currentNode, int i) {
     for(int vertex : currentNode.path) {
-        if (vertex == i) {
+        if (vertex == i)
             return false;
-        }
     }
     return true;
 }
-
-int BBSolver::calculateCost(Graph& graph, const BBSolver::Node &currentNode, int i) {
-    int lastVertex = currentNode.path.back();
-    int cost = graph.edges[lastVertex][i];
-    return currentNode.cost + cost;
-}
-
-
