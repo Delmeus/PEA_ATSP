@@ -55,6 +55,7 @@ void Graph::changeSize(int size) {
 void Graph::readGraphDirected(const std::string& s){
     std::string name = R"(..\input\)" + s;
     std::ifstream file(name);
+
     if(file.is_open()) {
         std::string line;
         std::vector<int> lineData;
@@ -67,14 +68,14 @@ void Graph::readGraphDirected(const std::string& s){
         while(std::getline(file, line)){
             std::stringstream lineStream(line);
             int value;
-            while (lineStream >> value)
+            while (lineStream >> value) {
                 lineData.push_back(value);
-            if(lineData.size() == vertices){
-                std::copy(lineData.begin(), lineData.end(), edges[i]);
-                i++;
-                lineData.clear();
+                if(lineData.size() == vertices){
+                    std::copy(lineData.begin(), lineData.end(), edges[i]);
+                    i++;
+                    lineData.clear();
+                }
             }
-
         }
 
         file.close();
