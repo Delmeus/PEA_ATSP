@@ -79,3 +79,14 @@ TabuManager::TabuManager(int tabuTimeIncreaseInterval, int tabuTimeLimit, int al
                                                                defineBestSolutionNeighboursInterval),
                                                        RANDOM_SOLUTION_INTERVAL(randomSolutionInterval) {}
 
+void TabuManager::emplaceInTabu(int v1, int v2, int v3, int v4, int tabuTime) {
+
+    tabuList.emplace_back(make_pair(v1, v2), tabuTime);
+    tabuList.emplace_back(make_pair(v2, v1), tabuTime);
+
+    if(v3 != -1 && v4 != -1){
+        tabuList.emplace_back(make_pair(v3, v4), tabuTime);
+        tabuList.emplace_back(make_pair(v4, v3), tabuTime);
+    }
+}
+

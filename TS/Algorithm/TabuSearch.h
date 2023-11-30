@@ -13,7 +13,7 @@ using namespace std;
 
 class TabuSearch {
 public:
-    static long TSSolver(Graph &graph, int numberOfIterations, bool print);
+    static int TSSolver(Graph &graph, int algorithmTime, bool print);
 private:
     struct Node{
         vector<int> path;
@@ -21,14 +21,14 @@ private:
         pair<int, int> move;
     };
 
+    static Node firstSolution(Graph &graph);
     static Node randomSolution(Graph &graph);
     static vector<Node> defineNeighbours(Graph &graph, const Node& currentSolution, int timeSinceChange, int tabuTime, Node &bestSolution, bool print);
     static int calculateCost(Graph &graph, Node node);
-    static bool isForbidden(pair<int, int> p);
     static void printNode(Node node);
     static Node findSolution(const Node& currentSolution, vector<Node>& neighbours, Node &bestSolution);
 
-    static void updateParameters(int timeSinceChange);
+
 };
 
 

@@ -34,6 +34,7 @@ public:
     void updateParameters(int timeSinceChange);
     bool isForbidden(pair<int, int> p);
     void decreaseTime();
+    void emplaceInTabu(int v1, int v2, int v3, int v4, int tabuTime);
 
 };
 

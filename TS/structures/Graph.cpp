@@ -60,9 +60,21 @@ void Graph::readGraphDirected(const std::string& s){
         std::string line;
         std::vector<int> lineData;
 
-        std::getline(file, line);
-        if(std::stoi(line) != vertices)
-            Graph::changeSize(std::stoi(line));
+        for(int i = 0; i < 4; i++)
+            std::getline(file, line);
+
+        std::string number_str;
+        for (char c : line) {
+            if (std::isdigit(c)) {
+                number_str += c;
+            }
+        }
+
+        int dimensionValue;
+        std::istringstream(number_str) >> dimensionValue;
+
+        if(dimensionValue != vertices)
+            Graph::changeSize(dimensionValue);
 
         int i = 0;
         while(std::getline(file, line)){
