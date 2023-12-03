@@ -16,7 +16,7 @@ public:
         TabuElement(const pair<int, int> &move, int time);
 
         pair<int, int> move;
-        int time;
+        int time{};
     };
 
     vector<TabuElement> tabuList;
@@ -28,6 +28,13 @@ public:
     int DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL;
     int RANDOM_SOLUTION_INTERVAL;
 
+    const int INITIAL_TABU_TIME_INCREASE_INTERVAL;
+    const int INITIAL_TABU_TIME_LIMIT;
+    const int INITIAL_ALLOW_WORSE_SOLUTION_INTERVAL;
+    const int INITIAL_ALLOW_WORSE_SOLUTION_ITERATION;
+    const int INITIAL_DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL;
+    const int INITIAL_RANDOM_SOLUTION_INTERVAL;
+
     TabuManager(int tabuTimeIncreaseInterval, int tabuTimeLimit, int allowWorseSolutionInterval,
                 int allowWorseSolutionIteration, int defineBestSolutionNeighboursInterval, int randomSolutionInterval);
 
@@ -35,6 +42,7 @@ public:
     bool isForbidden(pair<int, int> p);
     void decreaseTime();
     void emplaceInTabu(int v1, int v2, int v3, int v4, int tabuTime);
+
 
 };
 

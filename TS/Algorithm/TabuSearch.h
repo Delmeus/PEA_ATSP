@@ -8,25 +8,24 @@
 #include <vector>
 #include "../structures/Graph.h"
 #include "list"
+#include "Node.h"
 
 using namespace std;
 
 class TabuSearch {
 public:
-    static int TSSolver(Graph &graph, int algorithmTime, bool print);
+    static pair<int, long> TSSolver(Graph &graph, int algorithmTime, bool print, int neighbourhoodMethod);
+//    struct Node{
+//        vector<int> path;
+//        int cost = 0;
+//        pair<int, int> move;
+//    };
 private:
-    struct Node{
-        vector<int> path;
-        int cost = 0;
-        pair<int, int> move;
-    };
 
-    static Node firstSolution(Graph &graph);
-    static Node randomSolution(Graph &graph);
-    static vector<Node> defineNeighbours(Graph &graph, const Node& currentSolution, int timeSinceChange, int tabuTime, Node &bestSolution, bool print);
-    static int calculateCost(Graph &graph, Node node);
-    static void printNode(Node node);
-    static Node findSolution(const Node& currentSolution, vector<Node>& neighbours, Node &bestSolution);
+    static vector<Node> swapTwoCities(Graph &graph, const Node& currentSolution, int timeSinceChange, int tabuTime, Node &bestSolution);
+    static vector<Node> subPaths(Graph &graph, const Node& currentSolution, int timeSinceChange, int tabuTime, Node &bestSolution);
+    static vector<Node> permuteFragment(Graph &graph, const Node& currentSolution, int timeSinceChange, int tabuTime, Node &bestSolution);
+    static vector<Node> defineNeighbours(Graph &graph, const Node& currentSolution, int timeSinceChange, Node &bestSolution, int method, long iteration);
 
 
 };

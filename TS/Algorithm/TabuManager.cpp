@@ -5,23 +5,30 @@
 #include "TabuManager.h"
 
 TabuManager::TabuElement::TabuElement(const pair<int, int> &move, int time) {
-
+    this->move = move;
+    this->time = time;
 }
 
 void TabuManager::updateParameters(int timeSinceChange) {
+
     if (timeSinceChange == 0) {
-        TABU_TIME_LIMIT = 10;
-        RANDOM_SOLUTION_INTERVAL = 10000;
-        DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL = 1000;
-        ALLOW_WORSE_SOLUTION_INTERVAL = 200;
-        ALLOW_WORSE_SOLUTION_ITERATION = 20;
+//        TABU_TIME_LIMIT = 5;
+//        RANDOM_SOLUTION_INTERVAL = 10000;
+//        DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL = 5000;
+//        ALLOW_WORSE_SOLUTION_INTERVAL = 200;
+//        ALLOW_WORSE_SOLUTION_ITERATION = 20;
+        TABU_TIME_LIMIT = INITIAL_TABU_TIME_LIMIT;
+        RANDOM_SOLUTION_INTERVAL = INITIAL_RANDOM_SOLUTION_INTERVAL;
+        DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL = INITIAL_DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL;
+        ALLOW_WORSE_SOLUTION_INTERVAL = INITIAL_ALLOW_WORSE_SOLUTION_INTERVAL;
+        ALLOW_WORSE_SOLUTION_ITERATION = INITIAL_ALLOW_WORSE_SOLUTION_ITERATION;
 
 
     } else {
-        if (TABU_TIME_LIMIT < 300) {
-            TABU_TIME_LIMIT += 10;
+        if (TABU_TIME_LIMIT < 100) {
+            TABU_TIME_LIMIT += 5;
             for (int j = tabuList.size() - 1; j >= 0; j--) {
-                tabuList[j].time += 10;
+                tabuList[j].time += 5;
             }
         }
         if(timeSinceChange > 1000 && timeSinceChange < 20000 && timeSinceChange % 1000 == 0) {
@@ -41,8 +48,8 @@ void TabuManager::updateParameters(int timeSinceChange) {
                 RANDOM_SOLUTION_INTERVAL -= 50;
             if (timeSinceChange > 2000 && DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL < 10000)
                 DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL += 50;
-            if (ALLOW_WORSE_SOLUTION_INTERVAL > 50) {
-                ALLOW_WORSE_SOLUTION_INTERVAL -= 50;
+            if (ALLOW_WORSE_SOLUTION_INTERVAL > 10) {
+                ALLOW_WORSE_SOLUTION_INTERVAL -= 10;
                 if (ALLOW_WORSE_SOLUTION_ITERATION > 5) {
                     ALLOW_WORSE_SOLUTION_ITERATION--;
                 }
@@ -50,6 +57,7 @@ void TabuManager::updateParameters(int timeSinceChange) {
         }
 
     }
+
 }
 
 
@@ -69,15 +77,7 @@ void TabuManager::decreaseTime() {
     }
 }
 
-TabuManager::TabuManager(int tabuTimeIncreaseInterval, int tabuTimeLimit, int allowWorseSolutionInterval,
-                         int allowWorseSolutionIteration, int defineBestSolutionNeighboursInterval,
-                         int randomSolutionInterval) : TABU_TIME_INCREASE_INTERVAL(tabuTimeIncreaseInterval),
-                                                       TABU_TIME_LIMIT(tabuTimeLimit),
-                                                       ALLOW_WORSE_SOLUTION_INTERVAL(allowWorseSolutionInterval),
-                                                       ALLOW_WORSE_SOLUTION_ITERATION(allowWorseSolutionIteration),
-                                                       DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL(
-                                                               defineBestSolutionNeighboursInterval),
-                                                       RANDOM_SOLUTION_INTERVAL(randomSolutionInterval) {}
+
 
 void TabuManager::emplaceInTabu(int v1, int v2, int v3, int v4, int tabuTime) {
 
@@ -89,4 +89,23 @@ void TabuManager::emplaceInTabu(int v1, int v2, int v3, int v4, int tabuTime) {
         tabuList.emplace_back(make_pair(v4, v3), tabuTime);
     }
 }
+
+TabuManager::TabuManager(int tabuTimeIncreaseInterval, int tabuTimeLimit, int allowWorseSolutionInterval,
+                         int allowWorseSolutionIteration, int defineBestSolutionNeighboursInterval,
+                         int randomSolutionInterval) : TABU_TIME_INCREASE_INTERVAL(tabuTimeIncreaseInterval),
+                                                       TABU_TIME_LIMIT(tabuTimeLimit),
+                                                       ALLOW_WORSE_SOLUTION_INTERVAL(allowWorseSolutionInterval),
+                                                       ALLOW_WORSE_SOLUTION_ITERATION(allowWorseSolutionIteration),
+                                                       DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL(
+                                                               defineBestSolutionNeighboursInterval),
+                                                       RANDOM_SOLUTION_INTERVAL(randomSolutionInterval),
+                                                       INITIAL_TABU_TIME_INCREASE_INTERVAL(tabuTimeIncreaseInterval),
+                                                       INITIAL_TABU_TIME_LIMIT(tabuTimeLimit),
+                                                       INITIAL_ALLOW_WORSE_SOLUTION_INTERVAL(allowWorseSolutionInterval),
+                                                       INITIAL_ALLOW_WORSE_SOLUTION_ITERATION(allowWorseSolutionIteration),
+                                                       INITIAL_DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL(
+                                                                defineBestSolutionNeighboursInterval),
+                                                       INITIAL_RANDOM_SOLUTION_INTERVAL(randomSolutionInterval){}
+
+
 

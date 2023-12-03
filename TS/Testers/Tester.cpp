@@ -9,15 +9,18 @@
 #include "../Algorithm/TabuSearch.h"
 
 void Tester::test() {
-    int answer, time = 1, target;
-    string fileName = "ftv47.atsp";
+    int answer, time = 1, target, neighbourhoodMethod = 1;
+    string fileName = "ftv47.atsp", methodOfNeighbours = "Swap two cities";
     target = 1776;
     Graph graph(1);
+    graph.readGraphDirected(fileName);
     do{
         system("CLS");
         cout << "--------------Tabu Search--------------" << endl
             << "Current settings: " << endl
-            << "time = " << time << " min, " << "file = " << fileName << endl
+            << "time = " << time << " min, " << "target cost = " << target << ", file = " << fileName << endl
+            << "method of choosing neighbours = " << methodOfNeighbours << endl
+            << "------------------MENU------------------" << endl
             << "1. Test algorithm" << endl
             << "2. Load file" << endl
             << "3. Change stop condition" << endl
@@ -27,7 +30,7 @@ void Tester::test() {
         cin >> answer;
         switch(answer){
             case 1:
-                TabuSearch::TSSolver(graph, time, true);
+                TabuSearch::TSSolver(graph, time, true, neighbourhoodMethod);
                 waitForResponse();
                 break;
             case 2:
@@ -63,7 +66,25 @@ void Tester::test() {
                 }while(time < 0 || time > 15);
                 break;
             case 4:
-                cout << " ";
+                do {
+                    system("CLS");
+                    cout    << "How do you want to define neighbours?" << endl
+                            << "1. Swap two cities" << endl
+                            << "2. Swap two node sub-paths" << endl
+                            << "3. Permute a fragment" << endl
+                            << "4. Mixed method" << endl;
+                    cin >> answer;
+                }while(answer < 0 || answer > 4);
+                neighbourhoodMethod = answer;
+                if(answer == 1)
+                    methodOfNeighbours = "Swap two cities";
+                else if(answer == 2)
+                    methodOfNeighbours = "Swap two node sub-paths";
+                else if(answer == 3)
+                    methodOfNeighbours = "Permute a fragment";
+                else
+                    methodOfNeighbours = "Mixed method";
+                waitForResponse();
                 break;
             case 5:
                 int numberOfTests;
@@ -72,7 +93,7 @@ void Tester::test() {
                     cout << "How many tests do you want to run?" << endl;
                     cin >> numberOfTests;
                 }while(numberOfTests < 0);
-                automaticTest(fileName, time, target, numberOfTests);
+                automaticTest(fileName, time, target, numberOfTests, neighbourhoodMethod);
                 waitForResponse();
             default:
                 break;
@@ -80,14 +101,24 @@ void Tester::test() {
     }while(answer != 6);
 }
 
-void Tester::automaticTest(const string& name, int time, int target, int numberOfTests) {
+void Tester::automaticTest(const string& name, int time, int target, int numberOfTests, int neighbourhoodMethod) {
     ofstream file((R"(..\output\results_)" + name + ".csv"));
     Graph graph(1);
     graph.readGraphDirected(name);
-    file << "cost" << ";" << "from target" << ";" << target << endl;
+    if(neighbourhoodMethod == 1){
+        file << "Swap two cities" << endl;
+    }
+    else if(neighbourhoodMethod == 2)
+        file << "Swap two node sub-paths" << endl;
+    else if(neighbourhoodMethod == 3)
+        file << "Permute a fragment" << endl;
+    else
+        file << "Mixed method" << endl;
+
+    file << "cost" << ";" << "time" << ";" << "from target" << ";" << target << endl;
     for(int i = 0; i < numberOfTests; i++){
-        int result = TabuSearch::TSSolver(graph, time, false);
-        file << result << ";" << result - target << ";" << target << endl;
+        pair<int, long> result = TabuSearch::TSSolver(graph, time, false, neighbourhoodMethod);
+        file << result.first << ";" << result.second << ";" << result.first - target << ";" << target << endl;
     }
 }
 

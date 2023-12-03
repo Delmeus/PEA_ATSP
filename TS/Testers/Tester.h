@@ -10,7 +10,7 @@ using namespace std;
 class Tester {
 public:
     static void test();
-    static void automaticTest(const string& name, int time, int target, int numberOfTests);
+    static void automaticTest(const string& name, int time, int target, int numberOfTests, int neighbourhoodMethod);
     static void waitForResponse();
 };
 
