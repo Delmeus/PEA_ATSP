@@ -14,7 +14,7 @@ using namespace std;
 
 class TabuSearch {
 public:
-    static pair<int, long> TSSolver(Graph &graph, int algorithmTime, bool print, int neighbourhoodMethod);
+    static pair<Node, long> TSSolver(Graph &graph, int algorithmTime, bool print, int neighbourhoodMethod);
 //    struct Node{
 //        vector<int> path;
 //        int cost = 0;

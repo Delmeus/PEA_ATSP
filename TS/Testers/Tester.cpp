@@ -103,22 +103,34 @@ void Tester::test() {
 
 void Tester::automaticTest(const string& name, int time, int target, int numberOfTests, int neighbourhoodMethod) {
     ofstream file((R"(..\output\results_)" + name + ".csv"));
-    Graph graph(1);
-    graph.readGraphDirected(name);
-    if(neighbourhoodMethod == 1){
-        file << "Swap two cities" << endl;
-    }
-    else if(neighbourhoodMethod == 2)
-        file << "Swap two node sub-paths" << endl;
-    else if(neighbourhoodMethod == 3)
-        file << "Permute a fragment" << endl;
-    else
-        file << "Mixed method" << endl;
+    if(file.is_open()) {
+        Graph graph(1);
+        graph.readGraphDirected(name);
+        if (neighbourhoodMethod == 1) {
+            file << "Swap two cities" << endl;
+        } else if (neighbourhoodMethod == 2)
+            file << "Swap two node sub-paths" << endl;
+        else if (neighbourhoodMethod == 3)
+            file << "Permute a fragment" << endl;
+        else
+            file << "Mixed method" << endl;
 
-    file << "cost" << ";" << "time" << ";" << "from target" << ";" << target << endl;
-    for(int i = 0; i < numberOfTests; i++){
-        pair<int, long> result = TabuSearch::TSSolver(graph, time, false, neighbourhoodMethod);
-        file << result.first << ";" << result.second << ";" << result.first - target << ";" << target << endl;
+        file << "cost" << ";" << "time" << ";" << "from target" << ";" << target << endl;
+        Node node;
+        node.cost = INT_MAX;
+        for (int i = 0; i < numberOfTests; i++) {
+            pair<Node, long> result = TabuSearch::TSSolver(graph, time, false, neighbourhoodMethod);
+            file << result.first.cost << ";" << result.second << ";" << result.first.cost - target << ";" << target << endl;
+            if(node.cost > result.first.cost) {
+                node = result.first;
+            }
+        }
+
+        file << "path of best solution" << endl;
+        for(int item : node.path)
+            file << item << endl;
+        file << node.path[0] << endl;
+        file.close();
     }
 }
 
@@ -127,3 +139,4 @@ void Tester::waitForResponse() {
     cin.ignore(10000, '\n');
     getchar();
 }
+

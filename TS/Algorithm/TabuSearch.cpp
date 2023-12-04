@@ -10,7 +10,7 @@
 
 TabuManager params(1000, 5, 300, 20, 5000, 10000);
 
-pair<int, long> TabuSearch::TSSolver(Graph &graph, int algorithmTime, bool print, int neighbourhoodMethod) {
+pair<Node, long> TabuSearch::TSSolver(Graph &graph, int algorithmTime, bool print, int neighbourhoodMethod) {
     if(neighbourhoodMethod < 0 || neighbourhoodMethod > 4 || algorithmTime < 0 || graph.vertices < 4)
         throw invalid_argument("Received wrong arguments");
 
@@ -57,7 +57,9 @@ pair<int, long> TabuSearch::TSSolver(Graph &graph, int algorithmTime, bool print
             cout    << INTERVAL << "\tbest cost = " << bestSolution.cost << " current cost = " << currentSolution.cost << endl
                     << "\ttabu size = " << params.tabuList.size() << " possible neighbours = " << neighbours.size() << endl;
         }
-
+        /*
+         * find best solution among neighbours
+         */
         currentSolution = Node::findSolution(currentSolution, neighbours, bestSolution, params);
 
         if(currentSolution.cost < bestSolution.cost)
@@ -72,7 +74,7 @@ pair<int, long> TabuSearch::TSSolver(Graph &graph, int algorithmTime, bool print
     timer.stop();
     cout << "Solution found in " << bestSolutionTime << " ms" << endl;
     Node::printNode(bestSolution);
-    return make_pair(bestSolution.cost, bestSolutionTime);
+    return make_pair(bestSolution, bestSolutionTime);
 }
 
 vector<Node> TabuSearch::swapTwoCities(Graph &graph, const Node& currentSolution, int timeSinceChange, int tabuTime, Node &bestSolution) {
@@ -90,7 +92,9 @@ vector<Node> TabuSearch::swapTwoCities(Graph &graph, const Node& currentSolution
     Node bestLegalNeighbour;
     bestLegalNeighbour.cost = INT_MAX;
     for(int i = 0; i < neighboursQuantity; i++){
-
+        /*
+         * generate a pair of vertices
+         */
         Node neighbour = currentSolution;
         int vertex1 = randomVertex(gen);
         int vertex2;
@@ -145,7 +149,9 @@ vector<Node> TabuSearch::swapTwoCities(Graph &graph, const Node& currentSolution
             neighbour.cost = Node::calculateCost(graph, neighbour);
             neighbour.move.first = vertex1;
             neighbour.move.second = vertex2;
-
+            /*
+             * if cost of neighbour surpasses best cost don't forbid the move
+             */
             if(neighbour.cost < bestSolution.cost) {
                 neighbours.push_back(neighbour);
             }
@@ -154,14 +160,19 @@ vector<Node> TabuSearch::swapTwoCities(Graph &graph, const Node& currentSolution
                 params.tabuList.emplace_back(p, tabuTime);
                 params.tabuList.emplace_back(p1, tabuTime);
             }
+            /*
+             * if it was long enough since adding worse solution, allow solutions
+             * that are worse than current solution
+             */
             else if(timeSinceChange % params.ALLOW_WORSE_SOLUTION_INTERVAL == 0 && timeSinceChange != 0){
                 neighbours.push_back(neighbour);
                 params.tabuList.emplace_back(p, tabuTime * 2);
                 params.tabuList.emplace_back(p1, tabuTime * 2);
             }
 
-            if(neighbour.cost < bestLegalNeighbour.cost)
+            if(neighbour.cost < bestLegalNeighbour.cost) {
                 bestLegalNeighbour = neighbour;
+            }
         }
         else if(neighbour.cost < bestSolution.cost){
             neighbours.push_back(neighbour);
@@ -192,7 +203,9 @@ vector<Node> TabuSearch::subPaths(Graph &graph, const Node &currentSolution, int
     Node bestLegalNeighbour;
     bestLegalNeighbour.cost = INT_MAX;
     for(int i = 0; i < neighboursQuantity; i++){
-
+        /*
+         * generate two random vertices and create sub-paths including them
+         */
         Node neighbour = currentSolution;
         int vertex1 = randomVertex(gen);
         int vertex2;
@@ -216,9 +229,9 @@ vector<Node> TabuSearch::subPaths(Graph &graph, const Node &currentSolution, int
             neighbours.push_back(Node::randomSolution(graph));
             params.tabuList.clear();
         }
-            /*
-            * if generated neighbour isn't forbidden
-            */
+        /*
+        * if generated neighbour isn't forbidden
+        */
         else if(!params.isForbidden(p) && !params.isForbidden(p1)){
             if(vertex1 > vertex2){
                 neighbour.path.at(vertex2) = currentSolution.path.at(vertex1 - 1);
@@ -236,8 +249,9 @@ vector<Node> TabuSearch::subPaths(Graph &graph, const Node &currentSolution, int
             neighbour.cost = Node::calculateCost(graph, neighbour);
             neighbour.move.first = p.first;
             neighbour.move.second = p.second;
-
-
+            /*
+             * if cost of neighbour surpasses best cost don't forbid the move
+             */
             if(neighbour.cost < bestSolution.cost) {
                 neighbours.push_back(neighbour);
             }
@@ -246,6 +260,10 @@ vector<Node> TabuSearch::subPaths(Graph &graph, const Node &currentSolution, int
                 params.tabuList.emplace_back(p, tabuTime);
                 params.tabuList.emplace_back(p1, tabuTime);
             }
+            /*
+            * if it was long enough since adding worse solution, allow solutions
+            * that are worse than current solution
+            */
             else if(timeSinceChange % params.ALLOW_WORSE_SOLUTION_INTERVAL == 0 && timeSinceChange != 0){
                 neighbours.push_back(neighbour);
                 params.tabuList.emplace_back(p, tabuTime * 2);
@@ -276,7 +294,9 @@ vector<Node> TabuSearch::permuteFragment(Graph &graph, const Node &currentSoluti
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> randomVertex(0, graph.vertices - 6);
     vector<Node> neighbours;
-
+    /*
+     * generate a random vertex and get a fragment of the current solution
+     */
     Node bestLegalNeighbour, neighbour = currentSolution;
     bestLegalNeighbour.cost = INT_MAX;
     int vertex;
@@ -304,7 +324,9 @@ vector<Node> TabuSearch::permuteFragment(Graph &graph, const Node &currentSoluti
                 bestLegalNeighbour = neighbour;
         }while(next_permutation(fragment.begin(), fragment.end()));
     }
-
+    /*
+     * if no solution in neighbours, add the best legal neighbour
+     */
     if(neighbours.empty()) {
         if(bestLegalNeighbour.cost == INT_MAX)
             bestLegalNeighbour = currentSolution;
@@ -313,16 +335,18 @@ vector<Node> TabuSearch::permuteFragment(Graph &graph, const Node &currentSoluti
     }
     else{
         if(bestLegalNeighbour.cost > currentSolution.cost) {
-            params.tabuList.emplace_back(bestLegalNeighbour.move, tabuTime * 2);
+            params.tabuList.emplace_back(bestLegalNeighbour.move, tabuTime);
         }
         else if(bestLegalNeighbour.cost > bestSolution.cost){
-            params.tabuList.emplace_back(bestLegalNeighbour.move, tabuTime);
+            params.tabuList.emplace_back(bestLegalNeighbour.move, tabuTime / 2);
         }
     }
 
     return neighbours;
 }
-
+/*
+ * choose proper function depending on choice of method
+ */
 vector<Node> TabuSearch::defineNeighbours(Graph &graph, const Node &currentSolution, int timeSinceChange,
                                           Node &bestSolution, int method, long iteration) {
     vector<Node> newNeighbours;

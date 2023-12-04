@@ -51,25 +51,23 @@ Node Node::randomSolution(Graph &graph) {
     currentNode.move.second = -1;
     return currentNode;
 }
-
+/*
+ * generate initial solution using greedy method
+ */
 Node Node::firstSolution(Graph &graph) {
     Node solution;
     vector<bool> visited(graph.vertices, false);
-    for(int i = 0; i < graph.vertices; i++){
-        pair<int, int> bestCost;
-        bestCost.first = INT_MAX;
-        for(int j = 0; j < graph.vertices; j++){
-            if(graph.edges[i][j] < bestCost.first && !visited[j] && i != j){
-                bestCost.first = graph.edges[i][j];
-                bestCost.second = j;
-            }
-        }
-        solution.path.push_back(bestCost.second);
-        visited[bestCost.second] = true;
+    int currentVertex = 0;
+    solution.path.push_back(currentVertex);
+    visited[currentVertex] = true;
+
+    for (int i = 1; i < graph.vertices; ++i) {
+        int nearestNeighbor = findNearestNeighbour(graph, currentVertex, visited);
+        solution.path.push_back(nearestNeighbor);
+        visited[nearestNeighbor] = true;
+        currentVertex = nearestNeighbor;
     }
     solution.cost = Node::calculateCost(graph, solution);
-    solution.move.first = -1;
-    solution.move.second = -1;
     return solution;
 }
 
@@ -93,8 +91,10 @@ Node Node::findSolution(const Node &currentSolution, vector<Node> &neighbours, N
         }
 
         inTabu =  params.isForbidden(localSolution.move);
-
-        if(inTabu && bestCost < bestSolution.cost)
+        /*
+         * if current solution is better than best, ignore tabu restriction
+         */
+        if(bestCost < bestSolution.cost)
                 aspiration = true;
 
         if((aspiration || !inTabu) && betterThanCurrent){
@@ -103,16 +103,31 @@ Node Node::findSolution(const Node &currentSolution, vector<Node> &neighbours, N
             return localSolution;
         }
 
-        if(inTabu && localSolution.cost < solution.cost)
-            solution = localSolution;
+//        if(inTabu && localSolution.cost < solution.cost)
+//            solution = localSolution;
 
         if(position != -2) {
             neighbours.erase(neighbours.begin() + position);
         }
 
     }while(!neighbours.empty());
-
-    if(solution.cost < localSolution.cost)
-        return solution;
+//
+//    //zastanow sie/potestuj
+//    if(solution.cost < localSolution.cost)
+//        return solution;
     return localSolution;
+}
+
+int Node::findNearestNeighbour(const Graph &graph, int currentVertex, const vector<bool> &visited) {
+    int nearestNeighbor = -1;
+    int minDistance = std::numeric_limits<int>::max();
+
+    for (int i = 0; i < graph.vertices; ++i) {
+        if (!visited[i] && graph.edges[currentVertex][i] < minDistance) {
+            nearestNeighbor = i;
+            minDistance = graph.edges[currentVertex][i];
+        }
+    }
+
+    return nearestNeighbor;
 }

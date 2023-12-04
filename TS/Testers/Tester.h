@@ -5,6 +5,8 @@
 #ifndef TABUSEARCH_TESTER_H
 #define TABUSEARCH_TESTER_H
 
+#include <vector>
+
 using namespace std;
 
 class Tester {
