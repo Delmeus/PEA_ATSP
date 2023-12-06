@@ -12,11 +12,6 @@ TabuManager::TabuElement::TabuElement(const pair<int, int> &move, int time) {
 void TabuManager::updateParameters(int timeSinceChange) {
 
     if (timeSinceChange == 0) {
-//        TABU_TIME_LIMIT = 5;
-//        RANDOM_SOLUTION_INTERVAL = 10000;
-//        DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL = 5000;
-//        ALLOW_WORSE_SOLUTION_INTERVAL = 200;
-//        ALLOW_WORSE_SOLUTION_ITERATION = 20;
         TABU_TIME_LIMIT = INITIAL_TABU_TIME_LIMIT;
         RANDOM_SOLUTION_INTERVAL = INITIAL_RANDOM_SOLUTION_INTERVAL;
         DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL = INITIAL_DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL;
@@ -99,7 +94,6 @@ TabuManager::TabuManager(int tabuTimeIncreaseInterval, int tabuTimeLimit, int al
                                                        DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL(
                                                                defineBestSolutionNeighboursInterval),
                                                        RANDOM_SOLUTION_INTERVAL(randomSolutionInterval),
-                                                       INITIAL_TABU_TIME_INCREASE_INTERVAL(tabuTimeIncreaseInterval),
                                                        INITIAL_TABU_TIME_LIMIT(tabuTimeLimit),
                                                        INITIAL_ALLOW_WORSE_SOLUTION_INTERVAL(allowWorseSolutionInterval),
                                                        INITIAL_ALLOW_WORSE_SOLUTION_ITERATION(allowWorseSolutionIteration),

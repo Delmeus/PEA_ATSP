@@ -79,14 +79,12 @@ Node Node::findSolution(const Node &currentSolution, vector<Node> &neighbours, N
     solution.cost = INT_MAX;
     bool inTabu;
     do{
-        bool aspiration = false, betterThanCurrent = false;
+        bool aspiration = false;
         for (int i = neighbours.size() - 1; i >= 0; i--) {
             if (neighbours[i].cost < bestCost){
                 localSolution = neighbours[i];
                 bestCost = localSolution.cost;
                 position = i;
-                if (bestCost < currentSolution.cost)
-                    betterThanCurrent = true;
             }
         }
 
@@ -96,25 +94,22 @@ Node Node::findSolution(const Node &currentSolution, vector<Node> &neighbours, N
          */
         if(bestCost < bestSolution.cost)
                 aspiration = true;
-
-        if((aspiration || !inTabu) && betterThanCurrent){
-            if(localSolution.cost < bestSolution.cost)
-                bestSolution = localSolution;
+        /*
+         * return solution if conditions are met
+         */
+        if(aspiration || !inTabu){
             return localSolution;
         }
 
-//        if(inTabu && localSolution.cost < solution.cost)
-//            solution = localSolution;
+        if(localSolution.cost < solution.cost)
+            solution = localSolution;
 
         if(position != -2) {
             neighbours.erase(neighbours.begin() + position);
         }
 
     }while(!neighbours.empty());
-//
-//    //zastanow sie/potestuj
-//    if(solution.cost < localSolution.cost)
-//        return solution;
+
     return localSolution;
 }
 

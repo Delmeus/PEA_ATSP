@@ -93,7 +93,7 @@ void Tester::test() {
                     cout << "How many tests do you want to run?" << endl;
                     cin >> numberOfTests;
                 }while(numberOfTests < 0);
-                automaticTest(fileName, time, target, numberOfTests, neighbourhoodMethod);
+                automaticTest(fileName, time, target, numberOfTests, neighbourhoodMethod, methodOfNeighbours);
                 waitForResponse();
             default:
                 break;
@@ -101,8 +101,8 @@ void Tester::test() {
     }while(answer != 6);
 }
 
-void Tester::automaticTest(const string& name, int time, int target, int numberOfTests, int neighbourhoodMethod) {
-    ofstream file((R"(..\output\results_)" + name + ".csv"));
+void Tester::automaticTest(const string& name, int time, int target, int numberOfTests, int neighbourhoodMethod, const string& methodOfNeighbours) {
+    ofstream file((R"(..\output\results_)" + name + "_" + methodOfNeighbours + ".csv"));
     if(file.is_open()) {
         Graph graph(1);
         graph.readGraphDirected(name);

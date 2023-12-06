@@ -22,9 +22,9 @@ public:
 //    };
 private:
 
-    static vector<Node> swapTwoCities(Graph &graph, const Node& currentSolution, int timeSinceChange, int tabuTime, Node &bestSolution);
-    static vector<Node> subPaths(Graph &graph, const Node& currentSolution, int timeSinceChange, int tabuTime, Node &bestSolution);
-    static vector<Node> permuteFragment(Graph &graph, const Node& currentSolution, int timeSinceChange, int tabuTime, Node &bestSolution);
+    static vector<Node> swapTwoCities(Graph &graph, const Node& currentSolution, int timeSinceChange);
+    static vector<Node> subPaths(Graph &graph, const Node& currentSolution, int timeSinceChange);
+    static vector<Node> permuteFragment(Graph &graph, const Node& currentSolution, int timeSinceChange);
     static vector<Node> defineNeighbours(Graph &graph, const Node& currentSolution, int timeSinceChange, Node &bestSolution, int method, long iteration);
 
 

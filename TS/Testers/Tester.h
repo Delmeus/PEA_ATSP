@@ -12,7 +12,7 @@ using namespace std;
 class Tester {
 public:
     static void test();
-    static void automaticTest(const string& name, int time, int target, int numberOfTests, int neighbourhoodMethod);
+    static void automaticTest(const string& name, int time, int target, int numberOfTests, int neighbourhoodMethod, const string& methodOfNeighbours);
     static void waitForResponse();
 };
 
