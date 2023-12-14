@@ -72,13 +72,11 @@ Node Node::firstSolution(Graph &graph) {
 }
 
 Node Node::findSolution(const Node &currentSolution, vector<Node> &neighbours, Node &bestSolution, TabuManager params) {
-    int position = -2;
-    int bestCost = INT_MAX;
     Node localSolution = currentSolution;
-    Node solution;
-    solution.cost = INT_MAX;
-    bool inTabu;
+    Node solution = localSolution;
     do{
+        int position = -2;
+        int bestCost = INT_MAX;
         bool aspiration = false;
         for (int i = neighbours.size() - 1; i >= 0; i--) {
             if (neighbours[i].cost < bestCost){
@@ -87,8 +85,7 @@ Node Node::findSolution(const Node &currentSolution, vector<Node> &neighbours, N
                 position = i;
             }
         }
-
-        inTabu =  params.isForbidden(localSolution.move);
+        bool inTabu =  params.isForbidden(localSolution.move);
         /*
          * if current solution is better than best, ignore tabu restriction
          */
@@ -103,14 +100,19 @@ Node Node::findSolution(const Node &currentSolution, vector<Node> &neighbours, N
 
         if(localSolution.cost < solution.cost)
             solution = localSolution;
-
+        /*
+         * if there is more solutions and the current doesn't meet criteria,
+         * delete current solution from the neighbour list
+         */
         if(position != -2) {
             neighbours.erase(neighbours.begin() + position);
         }
 
     }while(!neighbours.empty());
-
-    return localSolution;
+    /*
+     * if no solution was legal, return best illegal solution
+     */
+    return solution;
 }
 
 int Node::findNearestNeighbour(const Graph &graph, int currentVertex, const vector<bool> &visited) {

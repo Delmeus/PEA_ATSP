@@ -18,11 +18,12 @@ public:
     pair<int, int> move;
 
     static int calculateCost(Graph &graph, Node node);
-    static int findNearestNeighbour(const Graph& graph, int currentVertex, const std::vector<bool>& visited);
     static void printNode(Node node);
     static Node randomSolution(Graph &graph);
     static Node firstSolution(Graph &graph);
     static Node findSolution(const Node& currentSolution, vector<Node>& neighbours, Node &bestSolution,  TabuManager params);
+private:
+    static int findNearestNeighbour(const Graph& graph, int currentVertex, const std::vector<bool>& visited);
 };
 
 

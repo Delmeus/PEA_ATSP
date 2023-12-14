@@ -95,28 +95,3 @@ void Graph::readGraphDirected(const std::string& s){
     else std::cout << "\nTHERE WAS A PROBLEM WITH OPENING FILE";
 }
 
-void Graph::display() const{
-
-    const int fieldWidth = 4;
-    std::cout << "Graph as matrix" << std::endl;
-
-    std::cout << std::setw(fieldWidth) << " " << " | ";
-    for (int j = 0; j < vertices; j++) {
-        std::cout << std::setw(fieldWidth) << j << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << std::setfill('-') << std::setw(fieldWidth + 1) << "" << "+" << std::setw((fieldWidth + 1) * vertices) << "" << std::setfill(' ') << std::endl;
-
-    for (int i = 0; i < vertices; i++) {
-        std::cout << std::setw(fieldWidth) << i << " | ";
-        for (int j = 0; j < vertices; j++) {
-            if(i == j)
-                std::cout << std::setw(fieldWidth) << "-" << " ";
-            else
-                std::cout << std::setw(fieldWidth) << edges[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-}
-

@@ -10,7 +10,7 @@
 
 TabuManager params(1000, 5, 300, 20, 5000, 10000);
 
-pair<Node, long> TabuSearch::TSSolver(Graph &graph, int algorithmTime, bool print, int neighbourhoodMethod) {
+pair<Node, long> TabuSearch::TSSolver(Graph &graph, int algorithmTime, bool print, int neighbourhoodMethod, int target) {
     if(neighbourhoodMethod < 0 || neighbourhoodMethod > 4 || algorithmTime < 0 || graph.vertices < 4)
         throw invalid_argument("Received wrong arguments");
 
@@ -29,7 +29,7 @@ pair<Node, long> TabuSearch::TSSolver(Graph &graph, int algorithmTime, bool prin
     Timer timer;
     timer.start();
 
-    while(timer.mili() < algorithmTime * 60 * 1000){
+    while(timer.mili() < algorithmTime * 60 * 1000 && bestSolution.cost != target){
         /*
          * if there was an improvement
          */
@@ -97,8 +97,6 @@ vector<Node> TabuSearch::swapTwoCities(Graph &graph, const Node& currentSolution
     if(timeSinceChange > 20000)
         neighboursQuantity *= 2;
 
-    Node bestLegalNeighbour;
-    bestLegalNeighbour.cost = INT_MAX;
     for(int i = 0; i < neighboursQuantity; i++){
         /*
          * generate a pair of vertices
@@ -144,7 +142,6 @@ vector<Node> TabuSearch::swapTwoCities(Graph &graph, const Node& currentSolution
             neighbour.move.first = vertex1;
             neighbour.move.second = vertex2;
             neighbours.push_back(neighbour);
-
         }
     }
 
@@ -155,15 +152,10 @@ vector<Node> TabuSearch::subPaths(Graph &graph, const Node &currentSolution, int
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> randomVertex(0, graph.vertices - 1);
-
     vector<Node> neighbours;
     int neighboursQuantity = graph.vertices;
-
     if(timeSinceChange > 20000)
         neighboursQuantity *= 2;
-
-    Node bestLegalNeighbour;
-    bestLegalNeighbour.cost = INT_MAX;
     for(int i = 0; i < neighboursQuantity; i++){
         /*
          * generate two random vertices and create sub-paths including them
@@ -212,36 +204,42 @@ vector<Node> TabuSearch::subPaths(Graph &graph, const Node &currentSolution, int
 }
 
 vector<Node> TabuSearch::permuteFragment(Graph &graph, const Node &currentSolution, int timeSinceChange) {
-
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> randomVertex(0, graph.vertices - 6);
     vector<Node> neighbours;
     /*
-     * generate a random vertex and get a fragment of the current solution
-     */
-    Node bestLegalNeighbour, neighbour = currentSolution;
-    bestLegalNeighbour.cost = INT_MAX;
-    int vertex;
-    int tries = 0;
-    pair<int, int> p;
-    do {
-        vertex = randomVertex(gen);
-        tries++;
-        p = make_pair(vertex, vertex + tries % 4 + 2);
-    }while(params.isForbidden(p) && tries < 100);
-    if(!params.isForbidden(p)) {
-        vector<int> fragment(currentSolution.path.begin() + vertex, currentSolution.path.begin() + vertex + tries % 4 + 2 + 1);
-        sort(fragment.begin(), fragment.end());
+    * generate random solution if time since change was long enough
+    */
+    if(timeSinceChange % params.RANDOM_SOLUTION_INTERVAL == 0 && timeSinceChange != 0){
+        for(int i = 0; i < graph.vertices; i++)
+            neighbours.push_back(Node::randomSolution(graph));
+        params.tabuList.clear();
+    }
+    else {
+        /*
+         * generate a random vertex and get a fragment of the current solution
+         */
+        Node neighbour = currentSolution;
+        int vertex;
+        int tries = 0;
+        pair<int, int> p;
         do {
-            copy(fragment.begin(), fragment.end(), neighbour.path.begin() + vertex);
-            neighbour.move = p;
-            neighbour.cost = Node::calculateCost(graph, neighbour);
-            /*
-             * to avoid adding too many neighbours
-             */
-            neighbours.push_back(neighbour);
-        } while (next_permutation(fragment.begin(), fragment.end()));
+            vertex = randomVertex(gen);
+            tries++;
+            p = make_pair(vertex, vertex + tries % 4 + 2);
+        } while (params.isForbidden(p) && tries < 100);
+        if (!params.isForbidden(p)) {
+            vector<int> fragment(currentSolution.path.begin() + vertex,
+                                 currentSolution.path.begin() + vertex + tries % 4 + 2 + 1);
+            sort(fragment.begin(), fragment.end());
+            do {
+                copy(fragment.begin(), fragment.end(), neighbour.path.begin() + vertex);
+                neighbour.move = p;
+                neighbour.cost = Node::calculateCost(graph, neighbour);
+                neighbours.push_back(neighbour);
+            } while (next_permutation(fragment.begin(), fragment.end()));
+        }
     }
     return neighbours;
 }

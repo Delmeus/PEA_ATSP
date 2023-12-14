@@ -30,7 +30,7 @@ void Tester::test() {
         cin >> answer;
         switch(answer){
             case 1:
-                TabuSearch::TSSolver(graph, time, true, neighbourhoodMethod);
+                TabuSearch::TSSolver(graph, time, true, neighbourhoodMethod, target);
                 waitForResponse();
                 break;
             case 2:
@@ -119,7 +119,8 @@ void Tester::automaticTest(const string& name, int time, int target, int numberO
         Node node;
         node.cost = INT_MAX;
         for (int i = 0; i < numberOfTests; i++) {
-            pair<Node, long> result = TabuSearch::TSSolver(graph, time, false, neighbourhoodMethod);
+            cout << "Test nr " << i << endl;
+            pair<Node, long> result = TabuSearch::TSSolver(graph, time, false, neighbourhoodMethod, target);
             file << result.first.cost << ";" << result.second << ";" << result.first.cost - target << ";" << target << endl;
             if(node.cost > result.first.cost) {
                 node = result.first;

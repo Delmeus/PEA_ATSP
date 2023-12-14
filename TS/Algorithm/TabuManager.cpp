@@ -17,8 +17,6 @@ void TabuManager::updateParameters(int timeSinceChange) {
         DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL = INITIAL_DEFINE_BEST_SOLUTION_NEIGHBOURS_INTERVAL;
         ALLOW_WORSE_SOLUTION_INTERVAL = INITIAL_ALLOW_WORSE_SOLUTION_INTERVAL;
         ALLOW_WORSE_SOLUTION_ITERATION = INITIAL_ALLOW_WORSE_SOLUTION_ITERATION;
-
-
     } else {
         if (TABU_TIME_LIMIT < 100) {
             TABU_TIME_LIMIT += 5;
@@ -52,7 +50,6 @@ void TabuManager::updateParameters(int timeSinceChange) {
         }
 
     }
-
 }
 
 

@@ -19,7 +19,6 @@ public:
     explicit Graph(int v);
     void readGraphDirected(const std::string& s);
     void changeSize(int size);
-    void display() const;
 
     virtual ~Graph();
 
