@@ -15,15 +15,15 @@ int main() {
         cout << "--------------Genetic algorithm--------------" << endl
              << "Current settings: " << endl
              << "time = " << time << " s, " << "target cost = " << target << ", file = " << fileName << endl
-             << "population size = " << ", mutation factor = " << ", crossover factor = " << endl
+             << "population size = " << ", mutation factor = " << ", orderCrossover factor = " << endl
              << "------------------MENU------------------" << endl
              << "1. Load graph" << endl
              << "2. Display graph" << endl
              << "3. Change stop condition" << endl
              << "4. Change mutation factor" << endl
-             << "5. Change crossover factor" << endl
+             << "5. Change orderCrossover factor" << endl
              << "6. Change mutation method"  << endl
-             << "7. Change crossover method" << endl
+             << "7. Change orderCrossover method" << endl
              << "8. Start algorithm" << endl
              << "9. Quit program" << endl;
         cin >> answer;
@@ -32,13 +32,15 @@ int main() {
                 do{
                     cout << "What file do you wish to load?\n1. ftv47.atsp\n2. ftv170.atsp\n3. rbg403.atsp" << endl;
                     cin >> answer;
-                } while(answer < 1 || answer > 3);
+                } while(answer < 1 || answer > 4);
                 if(answer == 1)
                     fileName = "ftv47.atsp";
                 else if(answer == 2)
                     fileName = "ftv170.atsp";
-                else
+                else if(answer == 3)
                     fileName = "rbg403.atsp";
+                else
+                    fileName = "test.atsp";
                 graph.readGraphDirected(fileName);
                 system("PAUSE");
                 system("CLS");

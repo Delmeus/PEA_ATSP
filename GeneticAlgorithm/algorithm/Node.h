@@ -12,12 +12,15 @@ using namespace std;
 
 class Node {
 private:
-    vector<int> chromosome;
-    int cost;
+    int cost = 0;
 public:
+    vector<int> chromosome;
+
     Node scrambleMutate();
     static Node generateRandomNode(const Graph& graph);
     void printNode();
+    void calculateCost(const Graph& graph);
+
 };
 
 

@@ -9,7 +9,7 @@
 
 Node Node::scrambleMutate() {
     //TODO consider dynamic number of changes
-    int numberOfChanges = (int) chromosome.size() / 10;
+    int numberOfChanges = (int) chromosome.size() / 10 + 2;
     vector<int> positions;
     random_device rd;
     mt19937 gen(rd());
@@ -37,10 +37,12 @@ Node Node::scrambleMutate() {
     uniform_int_distribution<> randomPosition(0, numberOfChanges - 1);
     Node mutatedNode;
     mutatedNode.chromosome = this->chromosome;
-    shuffle (shuffled.begin(), shuffled.end(), std::mt19937(std::random_device()()));
+    do {
+        shuffle(shuffled.begin(), shuffled.end(), std::mt19937(std::random_device()()));
+    }while(equal(positions.begin(), positions.end(), shuffled.begin()));
     for(int i = 0; i < numberOfChanges; i++){
         mutatedNode.chromosome[positions[i]] = this->chromosome[shuffled[i]];
-        //cout << positions[i] << "\t" << shuffled[i] << endl;
+        cout << positions[i] << "\t" << shuffled[i] << endl;
     }
     return mutatedNode;
 }
@@ -74,3 +76,16 @@ void Node::printNode() {
     }
     cout << chromosome[0] << endl << "cost = " << cost << endl;
 }
+
+void Node::calculateCost(const Graph& graph) {
+    this->cost = 0;
+    int previousVertex = this->chromosome[0];
+    for(auto vertex :  this->chromosome){
+        if(vertex == previousVertex)
+            continue;
+        this->cost += graph.edges[previousVertex][vertex];
+        previousVertex = vertex;
+    }
+    this->cost += graph.edges[this->chromosome.back()][ this->chromosome[0]];
+}
+

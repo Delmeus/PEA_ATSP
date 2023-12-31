@@ -14,8 +14,8 @@ private:
     vector<Node> population;
 
 public:
-    static void start(int populationSize, long stopCondition,  const Graph& graph);
-    Node crossover(Node parent1, Node parent2);
+    static void start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph);
+    static Node orderCrossover(const Node& parent1, const Node& parent2, int start);
 };
 
 
