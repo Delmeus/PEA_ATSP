@@ -6,16 +6,18 @@
 #define GENETICALGORITHM_NODE_H
 
 #include <vector>
+#include "../structures/Graph.h"
 
 using namespace std;
 
 class Node {
 private:
-    vector<int> path;
+    vector<int> chromosome;
     int cost;
 public:
-    Node mutate();
-    Node generateRandomNode();
+    Node scrambleMutate();
+    static Node generateRandomNode(const Graph& graph);
+    void printNode();
 };
 
 

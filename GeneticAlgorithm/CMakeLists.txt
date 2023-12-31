@@ -7,4 +7,8 @@ add_executable(GeneticAlgorithm main.cpp
         algorithm/Node.cpp
         algorithm/Node.h
         algorithm/GeneticAlgorithm.cpp
-        algorithm/GeneticAlgorithm.h)
+        algorithm/GeneticAlgorithm.h
+        structures/Graph.cpp
+        structures/Graph.h
+        utils/Timer.cpp
+        utils/Timer.h)

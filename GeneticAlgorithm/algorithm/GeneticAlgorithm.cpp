@@ -4,7 +4,12 @@
 
 #include "GeneticAlgorithm.h"
 
-void GeneticAlgorithm::start(int populationSize, long stopCondition) {
+void GeneticAlgorithm::start(int populationSize, long stopCondition, const Graph& graph) {
+    Node node;
+    node = Node::generateRandomNode(graph);
+    node.printNode();
+    Node newNode = node.scrambleMutate();
+    newNode.printNode();
 
 }
 
