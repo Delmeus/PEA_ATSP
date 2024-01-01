@@ -46,6 +46,23 @@ Node Node::scrambleMutate() {
     return mutatedNode;
 }
 
+Node Node::greedySolution(const Graph &graph){
+    Node solution;
+    vector<bool> visited(graph.vertices, false);
+    int currentVertex = 0;
+    solution.chromosome.push_back(currentVertex);
+    visited[currentVertex] = true;
+
+    for (int i = 1; i < graph.vertices; ++i) {
+        int nearestNeighbor = findNearestNeighbour(graph, currentVertex, visited);
+        solution.chromosome.push_back(nearestNeighbor);
+        visited[nearestNeighbor] = true;
+        currentVertex = nearestNeighbor;
+    }
+    solution.calculateCost(graph);
+    return solution;
+}
+
 Node Node::generateRandomNode(const Graph& graph) {
     vector<bool> visited;
     visited.resize(graph.vertices);
@@ -86,5 +103,45 @@ void Node::calculateCost(const Graph& graph) {
         previousVertex = vertex;
     }
     cost += graph.edges[chromosome.back()][chromosome[0]];
+}
+
+Node Node::selectParent(const vector<Node>& population) {
+    if(population.empty())
+        return *this;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    double totalFitness = 0.0;
+    for (const auto& node : population) {
+        totalFitness += node.fitness;
+    }
+
+    std::uniform_real_distribution<> distribution(0.0, totalFitness);
+    double randomValue = distribution(gen);
+    double cumulativeFitness = 0.0;
+
+    for (const auto& node : population) {
+        cumulativeFitness += node.fitness;
+        if (cumulativeFitness >= randomValue && equal(node.chromosome.begin(), node.chromosome.end(), chromosome.begin())) {
+            return node;
+        }
+    }
+
+    return population.front();
+}
+
+int Node::findNearestNeighbour(const Graph &graph, int currentVertex, const vector<bool> &visited) {
+    int nearestNeighbor = -1;
+    int minDistance = std::numeric_limits<int>::max();
+
+    for (int i = 0; i < graph.vertices; ++i) {
+        if (!visited[i] && graph.edges[currentVertex][i] < minDistance) {
+            nearestNeighbor = i;
+            minDistance = graph.edges[currentVertex][i];
+        }
+    }
+
+    return nearestNeighbor;
 }
 

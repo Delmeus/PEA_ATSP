@@ -8,17 +8,20 @@
 #include "iostream"
 #include "../utils/Timer.h"
 
-void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph) {
+double ALLOW_INTO_NEXT_GENERATION_THRESHOLD = 0.8;
+double MINIMAL_REQUIRED_FITNESS = 0.5;
+
+void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target) {
     vector<Node> population;
     /*
      * Initialize population
      */
+    population.push_back(Node::greedySolution(graph));
     while(population.size() < populationSize){
         population.push_back(Node::generateRandomNode(graph));
     }
     Node bestSolution;
     bestSolution.cost = INT_MAX;
-    Timer timer;
 
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
     default_random_engine generator(seed);
@@ -27,50 +30,69 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> randomVertex(0, graph.vertices / 2 + 1);
+
+    Timer timer;
     timer.start();
     timer.stop();
     timer.start();
-    while(timer.mili() < stopCondition * 1000){
+
+    while(timer.mili() < stopCondition * 1000 && bestSolution.cost != target){
         calculateFitness(population);
         if(bestSolution.cost > population[0].cost) {
             bestSolution = population[0];
             cout << "Found better solution -> " << bestSolution.cost << endl;
         }
         vector<Node> nextGeneration;
-        Node previousElement = population[0];
 
         for(auto element : population){
             /*
              * Let the best solutions go to the next generation
              */
-            if(element.fitness > 0.8) {
+            if(element.fitness > ALLOW_INTO_NEXT_GENERATION_THRESHOLD) {
                 nextGeneration.push_back(element);
             }
-            else if(element.fitness < 0.5)
+            /*
+             * If solutions have too small fitness, stop exploring them
+             */
+            else if(element.fitness < MINIMAL_REQUIRED_FITNESS)
                 break;
-            //if(element.fitness > 0.5){
+
             double value = distribution(generator);
             /*
             * Check if node should mutate
             */
-            if(1 - value < mutationFactor){
-                //cout << "mutation occured" << endl;
+            if(1 - value <= mutationFactor){
                 Node mutatedNode = element.scrambleMutate();
                 mutatedNode.calculateCost(graph);
                 nextGeneration.push_back(mutatedNode);
             }
             value = distribution(generator);
-            if(1 - value < crossoverFactor && element.fitness != previousElement.fitness){
-                //TODO change how nodes are chosen for crossover
+            /*
+             * Check if crossover should be performed
+             */
+            if(1 - value <= crossoverFactor){
+                /*
+                 * Select second parent
+                 */
+                Node parent = element.selectParent(population);
+                /*
+                 * If returned parent is the same node, skip crossover
+                 */
+                if(equal(parent.chromosome.begin(), parent.chromosome.end(), element.chromosome.begin()))
+                    continue;
+
                 int start = randomVertex(gen);
-                Node offspring = orderCrossover(element, previousElement, start);
-                offspring.calculateCost(graph);
+                /*
+                 * Generate first child
+                 */
+                Node offspring = orderCrossover(element, parent, start, graph);
                 nextGeneration.push_back(offspring);
-                offspring = orderCrossover(previousElement, element, start);
-                offspring.calculateCost(graph);
+                /*
+                 * Generate second child
+                 */
+                offspring = orderCrossover(parent, element, start, graph);
                 nextGeneration.push_back(offspring);
             }
-            previousElement = element;
         }
         population = nextGeneration;
         timer.stop();
@@ -78,7 +100,7 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
     bestSolution.printNode();
 }
 
-Node GeneticAlgorithm::orderCrossover(const Node& parent1, const Node& parent2, int start) {
+Node GeneticAlgorithm::orderCrossover(const Node& parent1, const Node& parent2, int start, const Graph& graph) {
 
     Node offspring;
     int size = (int) parent1.chromosome.size();
@@ -119,15 +141,26 @@ Node GeneticAlgorithm::orderCrossover(const Node& parent1, const Node& parent2, 
         j++;
         i++;
     }while(j != start);
+
+    offspring.calculateCost(graph);
+
     return offspring;
 }
 
 void GeneticAlgorithm::calculateFitness(vector<Node> &population) {
     sort(population.begin(), population.end(), compareByCost);
-    double score = 1;
-    for(auto &element : population){
-        element.fitness = score;;
-        score -= 0.01;
+    double minCost = population.front().cost;
+    double maxCost = population.back().cost;
+
+    double costRange = maxCost - minCost;
+
+    for (auto &node : population) {
+        if (costRange > 0) {
+            double score = (node.cost - minCost) / costRange;
+            node.fitness = 1 - score;
+        } else {
+            node.fitness = 1;
+        }
     }
 }
 
