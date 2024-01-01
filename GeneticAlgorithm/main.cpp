@@ -93,7 +93,7 @@ int main() {
                 break;
             case 9:
                 cout << endl;
-                GeneticAlgorithm::start(100, time, 0.01, 0.8, graph, target);
+                GeneticAlgorithm::start(size, time, mutationFactor, crossoverFactor, graph, target);
                 system("PAUSE");
                 system("CLS");
                 break;

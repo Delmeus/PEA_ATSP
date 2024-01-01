@@ -13,9 +13,11 @@ class GeneticAlgorithm {
 private:
     //static vector<Node> population;
 
-    static Node orderCrossover(const Node& parent1, const Node& parent2, int start, const Graph& graph);
+    static Node orderCrossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
+    static Node pmx(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
     static void calculateFitness(vector<Node> &population);
     static bool compareByCost(const Node& a, const Node& b);
+    static int getIndex(const vector<int>& v, int K);
 public:
     static void start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target);
 };
