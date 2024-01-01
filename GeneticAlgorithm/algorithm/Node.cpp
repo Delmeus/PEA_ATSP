@@ -42,7 +42,6 @@ Node Node::scrambleMutate() {
     }while(equal(positions.begin(), positions.end(), shuffled.begin()));
     for(int i = 0; i < numberOfChanges; i++){
         mutatedNode.chromosome[positions[i]] = this->chromosome[shuffled[i]];
-        cout << positions[i] << "\t" << shuffled[i] << endl;
     }
     return mutatedNode;
 }
@@ -62,11 +61,11 @@ Node Node::generateRandomNode(const Graph& graph) {
         int currentVertex = randomVertex(gen);
         if(visited[currentVertex] || currentVertex == previousVertex)
             continue;
-        currentNode.cost += graph.edges[previousVertex][currentVertex];
         currentNode.chromosome.push_back(currentVertex);
         visited[currentVertex] = true;
         previousVertex = currentVertex;
     }
+    currentNode.calculateCost(graph);
     return currentNode;
 }
 
@@ -78,14 +77,14 @@ void Node::printNode() {
 }
 
 void Node::calculateCost(const Graph& graph) {
-    this->cost = 0;
-    int previousVertex = this->chromosome[0];
-    for(auto vertex :  this->chromosome){
+    cost = 0;
+    int previousVertex = chromosome[0];
+    for(auto vertex : chromosome){
         if(vertex == previousVertex)
             continue;
-        this->cost += graph.edges[previousVertex][vertex];
+        cost += graph.edges[previousVertex][vertex];
         previousVertex = vertex;
     }
-    this->cost += graph.edges[this->chromosome.back()][ this->chromosome[0]];
+    cost += graph.edges[chromosome.back()][chromosome[0]];
 }
 

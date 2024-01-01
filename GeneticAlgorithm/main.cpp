@@ -5,7 +5,7 @@
 using namespace std;
 
 int main() {
-    int answer, time = 1, target;
+    int answer, time = 60, target;
     string fileName = "ftv47.atsp";
     target = 1776;
     Graph graph(1);
@@ -57,7 +57,8 @@ int main() {
             case 5:
                 break;
             case 8:
-                GeneticAlgorithm::start(0,0,graph);
+                cout << endl;
+                GeneticAlgorithm::start(100, time, 0.01, 0.8, graph);
                 system("PAUSE");
                 system("CLS");
                 break;
