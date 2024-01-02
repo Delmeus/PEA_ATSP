@@ -8,6 +8,7 @@
 #include "iostream"
 #include "../utils/Timer.h"
 
+int MINIMAL_AMOUNT_OF_INDIVIDUALS = 20;
 double ALLOW_INTO_NEXT_GENERATION_THRESHOLD = 0.8;
 double MINIMAL_REQUIRED_FITNESS = 0.5;
 
@@ -43,12 +44,13 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
             cout << "Found better solution -> " << bestSolution.cost << endl;
         }
         vector<Node> nextGeneration;
+        cout << "Population size = " << population.size() << endl;
 
         for(auto element : population){
             /*
              * Let the best solutions go to the next generation
              */
-            if(element.fitness > ALLOW_INTO_NEXT_GENERATION_THRESHOLD) {
+            if(nextGeneration.size() < MINIMAL_AMOUNT_OF_INDIVIDUALS) {
                 nextGeneration.push_back(element);
             }
             /*
@@ -88,14 +90,26 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
                 /*
                  * Generate first child
                  */
-                //Node offspring = pmx(element, parent, start, segmentLength, graph);
-                Node offspring = orderCrossover(element, parent, start, segmentLength, graph);
+                cout << "parent1" << endl;
+                element.printNode();
+                cout << "parent2"<< endl;
+                parent.printNode();
+                Node offspring = pmx(element, parent, start, segmentLength, graph);
+                if(hasDuplicates(offspring.chromosome))
+                    system("pause");
+                // offspring = orderCrossover(element, parent, start, segmentLength, graph);
                 nextGeneration.push_back(offspring);
                 /*
                  * Generate second child
                  */
-                //offspring = pmx(parent, element, start, segmentLength, graph);
-                offspring = orderCrossover(parent, element, start, segmentLength, graph);
+                cout << "parent1"<< endl;
+                parent.printNode();
+                cout << "parent2" << endl;
+                element.printNode();
+                offspring = pmx(parent, element, start, segmentLength, graph);
+                if(hasDuplicates(offspring.chromosome))
+                    system("pause");
+                //offspring = orderCrossover(parent, element, start, segmentLength, graph);
                 nextGeneration.push_back(offspring);
             }
         }
@@ -153,75 +167,119 @@ Node GeneticAlgorithm::orderCrossover(const Node& parent1, const Node& parent2, 
 }
 //TODO fix - gets stuck
 Node GeneticAlgorithm::pmx(const Node &parent1, const Node &parent2, int start, int segmentLength, const Graph &graph) {
+    
     Node offspring;
     int size = (int) parent1.chromosome.size();
 
     vector<int> newChromosome(size, -1);
-    /*
-     * copy a segment of parent1 into offspring
-     */
+
     copy(parent1.chromosome.begin() + start, parent1.chromosome.begin() + start + segmentLength, newChromosome.begin() + start);
     offspring.chromosome = newChromosome;
-    /*
-     * create a map to track which cities are included in chromosome
-     */
-    map<int, bool> values;
-    for(int i = 0; i < size; i++){
-        if(find(offspring.chromosome.begin(), offspring.chromosome.end(), i) != offspring.chromosome.end()){
-            values[i] = true;
-        }
-        else
-            values[i] = false;
-    }
 
+    vector<pair<int,int>> waitingForCopy;
     for(int i = start; i < start + segmentLength; i++){
-        /*
-         * If value from parent2 is already in offspring, continue
-         */
         if(find(offspring.chromosome.begin(), offspring.chromosome.end(), parent2.chromosome[i]) != offspring.chromosome.end())
             continue;
-        /*
-         * Get index at which value from parent2 is at in parent1
-         */
-        int index = getIndex(parent1.chromosome, parent2.chromosome[i]);
-        /*
-         * If this position in offspring is free, fill it with this value
-         */
-        if(offspring.chromosome[index] == -1) {
-            offspring.chromosome[index] = parent2.chromosome[i];
-            values[parent2.chromosome[i]] = true;
-        }
-        /*
-         * Else check what element was copied at the place of value currently being explored
-         */
-        else {
-            int value = parent1.chromosome[i];
-            index = getIndex(parent1.chromosome, value);
-            offspring.chromosome[index] = parent2.chromosome[i];
-            values[parent2.chromosome[i]] = true;
-        }
+        waitingForCopy.emplace_back(parent2.chromosome[i], i);
     }
-    /*
-     * Use parent2 to fill in the gaps is offspring
-     */
-    int i = start + segmentLength;
-    int j = i;
-    do{
-        if(i >= size)
-            i = 0;
-        if(j >= size)
-            j = 0;
-        if(values[parent2.chromosome[i]])
-            j--;
-        else{
-            offspring.chromosome[j] = parent2.chromosome[i];
-            values[parent2.chromosome[i]] = true;
+    cout << "dziecko przed " << endl;
+    offspring.printNode();
+
+    for(auto gene : waitingForCopy){
+        if(find(offspring.chromosome.begin(), offspring.chromosome.end(), gene.first) != offspring.chromosome.end())
+            continue;
+        int v = parent1.chromosome[gene.second];
+        int index = getIndex(parent2.chromosome, v);
+        cout << "start = " << start << " end = " << start + segmentLength << " v = " << v << " index = " << index << endl;
+
+        while(start <= index  && index < start + segmentLength){
+            int prevIndex = index;
+            index = getIndex(parent2.chromosome, v);
+            cout << "new index = " << index << endl;
+            v = parent1.chromosome[index];
+            if (prevIndex == index || index < start || index >= start + segmentLength) {
+                break;
+            }
+
         }
-        j++;
-        i++;
-    }while(j != start);
+        offspring.chromosome[index] = gene.first;
+    }
+
+
+    if(hasDuplicates(offspring.chromosome)){
+        cout << "W trakcie powstał duplikat" << endl;
+        offspring.printNode();
+        system("pause");
+    }
+
+    for(int i = 0; i < size; i++){
+        if(offspring.chromosome[i] == -1)
+            offspring.chromosome[i] = parent2.chromosome[i];
+    }
+
+//
+//    for(int i = start; i < start + segmentLength; i++){
+//        /*
+//         * If value from parent2 is already in offspring, continue
+//         */
+//        if(find(offspring.chromosome.begin(), offspring.chromosome.end(), parent2.chromosome[i]) != offspring.chromosome.end())
+//            continue;
+//        /*
+//         * Get index at which value from parent2 is at in parent1
+//         */
+//        int index = getIndex(parent1.chromosome, parent2.chromosome[i]);
+//        /*
+//         * If this position in offspring is free, fill it with this value
+//         */
+//        if(offspring.chromosome[index] == -1) {
+//            offspring.chromosome[index] = parent2.chromosome[i];
+//            values[parent2.chromosome[i]] = true;
+//        }
+//        /*
+//         * Else check what element was copied at the place of value currently being explored
+//         */
+//        else {
+//            int value = parent1.chromosome[i];
+//            index = getIndex(parent1.chromosome, value);
+//            offspring.chromosome[index] = parent2.chromosome[i];
+//            values[parent2.chromosome[i]] = true;
+//        }
+//    }
+//    /*
+//     * Use parent2 to fill in the gaps is offspring
+//     */
+//    cout << "Offspring" << endl;
+//    offspring.printNode();
+//    cout << "mapa" << endl;
+//    for(pair<int, bool> p : values){
+//        if(p.second)
+//            cout << p.first << " - true" << endl;
+//        else
+//            cout << p.first << " - false" << endl;
+//    }
+//
+//    int i = start + segmentLength;
+//    int j = i;
+//    do{
+//        if(i >= size)
+//            i = 0;
+//        if(j >= size)
+//            j = 0;
+//        if(values[parent2.chromosome[i]])
+//            j--;
+//        else{
+//            offspring.chromosome[j] = parent2.chromosome[i];
+//            values[parent2.chromosome[i]] = true;
+//        }
+//        //printf("i = %d, j = %d, values = %d\noffspring[j] = %d, parent1[i] = %d, parent2[i] = %d\n", i, j, values[parent2.chromosome[i]], offspring.chromosome[j], parent1.chromosome[i], parent2.chromosome[i]);
+//        j++;
+//        i++;
+//    }while(j != start);
+
 
     offspring.calculateCost(graph);
+    cout << "dziecko po uzyciu segmentu od " << start << " do " << start + segmentLength << endl;
+    offspring.printNode();
     return offspring;
 }
 

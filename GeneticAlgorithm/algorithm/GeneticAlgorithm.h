@@ -5,7 +5,9 @@
 #ifndef GENETICALGORITHM_GENETICALGORITHM_H
 #define GENETICALGORITHM_GENETICALGORITHM_H
 
+#include <unordered_set>
 #include "Node.h"
+#include "iostream"
 
 using namespace std;
 
@@ -18,6 +20,23 @@ private:
     static void calculateFitness(vector<Node> &population);
     static bool compareByCost(const Node& a, const Node& b);
     static int getIndex(const vector<int>& v, int K);
+
+
+    static bool hasDuplicates(const std::vector<int>& vec) {
+        std::unordered_set<int> uniqueValues;
+
+        for (int value : vec) {
+            if(value == -1)
+                continue;
+            // If the value is already in the set, it's a duplicate
+            if (!uniqueValues.insert(value).second) {
+                cout << "duplicate:" << value << endl;
+                return true; // Duplicate found
+            }
+        }
+
+        return false; // No duplicates found
+    }
 public:
     static void start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target);
 };

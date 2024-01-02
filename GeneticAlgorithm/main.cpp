@@ -7,7 +7,7 @@ using namespace std;
 int main() {
     int answer, time = 60, target, size = 100;
     double crossoverFactor = 0.8;
-    double mutationFactor = 0.01;
+    double mutationFactor = 0.00;
     string fileName = "ftv47.atsp";
     target = 1776;
     Graph graph(1);
