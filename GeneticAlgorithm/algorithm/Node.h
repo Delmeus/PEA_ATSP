@@ -25,7 +25,9 @@ public:
     void printNode();
     void calculateCost(const Graph& graph);
 
-
+    bool operator==(const Node& other) const {
+        return chromosome == other.chromosome;
+    }
 
 };
 

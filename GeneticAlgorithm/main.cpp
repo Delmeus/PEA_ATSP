@@ -8,25 +8,33 @@ int main() {
     int answer, time = 60, target, size = 100;
     double crossoverFactor = 0.8;
     double mutationFactor = 0.00;
+    bool orderCrossover = true;
     string fileName = "ftv47.atsp";
     target = 1776;
     Graph graph(1);
     graph.readGraphDirected(fileName);
     do{
+        string method;
+        if(orderCrossover)
+            method = "order crossover";
+        else
+            method = "pmx";
+
         system("CLS");
         cout << "--------------Genetic algorithm--------------" << endl
              << "Current settings: " << endl
-             << "time = " << time << " s, " << "target cost = " << target << ", file = " << fileName << endl
-             << "population size = " << size << ", mutation factor = " << mutationFactor << ", orderCrossover factor = " << crossoverFactor << endl
+             << "Time = " << time << " s, " << "target cost = " << target << ", file = " << fileName << endl
+             << "Population size = " << size << ", mutation factor = " << mutationFactor << endl
+             << "Crossover factor = " << crossoverFactor << ", crossover method = " << method << endl
              << "------------------MENU------------------" << endl
              << "1. Load graph" << endl
              << "2. Display graph" << endl
              << "3. Change stop condition" << endl
              << "4. Change initial population size" << endl
              << "5. Change mutation factor" << endl
-             << "6. Change orderCrossover factor" << endl
+             << "6. Change crossover factor" << endl
              << "7. Change mutation method"  << endl
-             << "8. Change orderCrossover method" << endl
+             << "8. Change crossover method" << endl
              << "9. Start algorithm" << endl
              << "10. Quit program" << endl;
         cin >> answer;
@@ -91,9 +99,12 @@ int main() {
                     system("PAUSE");
                 }while(crossoverFactor <= 0 || crossoverFactor > 1);
                 break;
+            case 8:
+                orderCrossover = !orderCrossover;
+                break;
             case 9:
                 cout << endl;
-                GeneticAlgorithm::start(size, time, mutationFactor, crossoverFactor, graph, target);
+                GeneticAlgorithm::start(size, time, mutationFactor, crossoverFactor, graph, target, orderCrossover);
                 system("PAUSE");
                 system("CLS");
                 break;

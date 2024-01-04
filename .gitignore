@@ -1,1 +1,8 @@
 cmake-build-debug/
+.cmake/
+CMakeFiles/
+Testing/
+.txt
+.cbp
+Makefile
+.cmake

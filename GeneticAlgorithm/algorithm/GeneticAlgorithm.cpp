@@ -8,16 +8,17 @@
 #include "iostream"
 #include "../utils/Timer.h"
 
-int MINIMAL_AMOUNT_OF_INDIVIDUALS = 20;
+int MINIMAL_AMOUNT_OF_INDIVIDUALS = 10;
 double ALLOW_INTO_NEXT_GENERATION_THRESHOLD = 0.8;
 double MINIMAL_REQUIRED_FITNESS = 0.5;
 
-void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target) {
+void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool method) {
+    int MAXIMAL_POPULATION_SIZE = populationSize * 400;
     vector<Node> population;
     /*
      * Initialize population
      */
-    //population.push_back(Node::greedySolution(graph));
+    population.push_back(Node::greedySolution(graph));
     while(population.size() < populationSize){
         population.push_back(Node::generateRandomNode(graph));
     }
@@ -41,23 +42,27 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
         calculateFitness(population);
         if(bestSolution.cost > population[0].cost) {
             bestSolution = population[0];
-            cout << "Found better solution -> " << bestSolution.cost << endl;
+            cout << "Found better solution -> " << bestSolution.cost << " current population size = " << population.size() << endl;
+        }
+        /*
+         * Select individuals who can potentially mate or mutate
+         */
+        for(int i = (int) population.size(); i >= 0; i--){
+            if((population[i].fitness < MINIMAL_REQUIRED_FITNESS && i > MINIMAL_AMOUNT_OF_INDIVIDUALS * 2) || i > MAXIMAL_POPULATION_SIZE){
+                population.pop_back();
+            }
+            else
+                break;
         }
         vector<Node> nextGeneration;
-        cout << "Population size = " << population.size() << endl;
 
         for(auto element : population){
             /*
              * Let the best solutions go to the next generation
              */
-            if(nextGeneration.size() < MINIMAL_AMOUNT_OF_INDIVIDUALS) {
+            if((element.fitness > ALLOW_INTO_NEXT_GENERATION_THRESHOLD || (int) nextGeneration.size() < MINIMAL_AMOUNT_OF_INDIVIDUALS) && !containsNode(nextGeneration, element)) {
                 nextGeneration.push_back(element);
             }
-            /*
-             * If solutions have too small fitness, stop exploring them
-             */
-            else if(element.fitness < MINIMAL_REQUIRED_FITNESS)
-                break;
 
             double value = distribution(generator);
             /*
@@ -66,7 +71,9 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
             if(1 - value <= mutationFactor){
                 Node mutatedNode = element.scrambleMutate();
                 mutatedNode.calculateCost(graph);
-                nextGeneration.push_back(mutatedNode);
+                if(!containsNode(nextGeneration, mutatedNode)) {
+                    nextGeneration.push_back(mutatedNode);
+                }
             }
             value = distribution(generator);
             /*
@@ -90,29 +97,26 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
                 /*
                  * Generate first child
                  */
-                cout << "parent1" << endl;
-                element.printNode();
-                cout << "parent2"<< endl;
-                parent.printNode();
-                Node offspring = pmx(element, parent, start, segmentLength, graph);
+                Node offspring = crossover(element, parent, start, segmentLength, graph, method);
                 if(hasDuplicates(offspring.chromosome))
-                    system("pause");
-                // offspring = orderCrossover(element, parent, start, segmentLength, graph);
-                nextGeneration.push_back(offspring);
+                    throw std::invalid_argument( "Duplicate occured" );
+
+                if(!containsNode(nextGeneration, offspring)) {
+                    nextGeneration.push_back(offspring);
+                }
                 /*
                  * Generate second child
                  */
-                cout << "parent1"<< endl;
-                parent.printNode();
-                cout << "parent2" << endl;
-                element.printNode();
-                offspring = pmx(parent, element, start, segmentLength, graph);
+                offspring = crossover(parent, element, start, segmentLength, graph, method);
                 if(hasDuplicates(offspring.chromosome))
-                    system("pause");
-                //offspring = orderCrossover(parent, element, start, segmentLength, graph);
-                nextGeneration.push_back(offspring);
+                    throw std::invalid_argument( "Duplicate occured" );
+
+                if(!containsNode(nextGeneration, offspring)) {
+                    nextGeneration.push_back(offspring);
+                }
             }
         }
+
         population = nextGeneration;
         timer.stop();
     }
@@ -243,4 +247,21 @@ int GeneticAlgorithm::getIndex(const vector<int>& v, int K)
     else {
         return -1;
     }
+}
+
+/*
+ * To avoid duplicates in population
+ */
+bool GeneticAlgorithm::containsNode(const vector<Node> &nextGeneration, const Node &node) {
+    return std::find(nextGeneration.begin(), nextGeneration.end(), node) != nextGeneration.end();
+}
+
+Node GeneticAlgorithm::crossover(const Node &parent1, const Node &parent2, int start, int segmentLength, const Graph &graph, bool order) {
+    if(order){
+        return orderCrossover(parent1, parent2, start, segmentLength, graph);
+    }
+    else{
+        return pmx(parent1, parent2, start, segmentLength, graph);
+    }
+
 }
