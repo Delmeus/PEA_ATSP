@@ -52,7 +52,7 @@ void Graph::changeSize(int size) {
     }
 }
 
-void Graph::readGraphDirected(const std::string& s){
+int Graph::readGraphDirected(const std::string& s){
     std::string name = R"(..\input\)" + s;
     std::ifstream file(name);
 
@@ -91,8 +91,12 @@ void Graph::readGraphDirected(const std::string& s){
         }
 
         file.close();
+        return 0;
     }
-    else std::cout << "\nTHERE WAS A PROBLEM WITH OPENING FILE";
+    else {
+        std::cout << "\nTHERE WAS A PROBLEM WITH OPENING FILE" << std::endl;
+        return -1;
+    }
 }
 
 void Graph::display() const{
@@ -117,6 +121,53 @@ void Graph::display() const{
                 std::cout << std::setw(fieldWidth) << edges[i][j] << " ";
         }
         std::cout << std::endl;
+    }
+}
+
+int Graph::readGraphDirectedAbsolute(const std::string &s) {
+    std::string name = s;
+    std::ifstream file(name);
+
+    if(file.is_open()) {
+        std::string line;
+        std::vector<int> lineData;
+
+        for(int i = 0; i < 4; i++)
+            std::getline(file, line);
+
+        std::string number_str;
+        for (char c : line) {
+            if (std::isdigit(c)) {
+                number_str += c;
+            }
+        }
+
+        int dimensionValue;
+        std::istringstream(number_str) >> dimensionValue;
+
+        if(dimensionValue != vertices)
+            Graph::changeSize(dimensionValue);
+
+        int i = 0;
+        while(std::getline(file, line)){
+            std::stringstream lineStream(line);
+            int value;
+            while (lineStream >> value) {
+                lineData.push_back(value);
+                if(lineData.size() == vertices){
+                    std::copy(lineData.begin(), lineData.end(), edges[i]);
+                    i++;
+                    lineData.clear();
+                }
+            }
+        }
+
+        file.close();
+        return 0;
+    }
+    else {
+        std::cout << "\nTHERE WAS A PROBLEM WITH OPENING FILE" << std::endl;
+        return -1;
     }
 }
 

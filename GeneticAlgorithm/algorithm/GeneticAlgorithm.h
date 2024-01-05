@@ -41,7 +41,7 @@ private:
     static bool containsNode(const vector<Node>& nextGeneration, const Node& node);
 
 public:
-    static void start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool method);
+    static void start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool method, bool print);
 };
 
 

@@ -8,11 +8,11 @@
 #include "iostream"
 #include "../utils/Timer.h"
 
-int MINIMAL_AMOUNT_OF_INDIVIDUALS = 10;
+int MINIMAL_AMOUNT_OF_INDIVIDUALS = 100;
 double ALLOW_INTO_NEXT_GENERATION_THRESHOLD = 0.8;
 double MINIMAL_REQUIRED_FITNESS = 0.5;
 
-void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool method) {
+void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool method, bool print) {
     int MAXIMAL_POPULATION_SIZE = populationSize * 400;
     vector<Node> population;
     /*
@@ -38,11 +38,15 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
     timer.stop();
     timer.start();
 
+    long solutionTime = 0;
+
     while(timer.mili() < stopCondition * 1000 && bestSolution.cost != target){
         calculateFitness(population);
         if(bestSolution.cost > population[0].cost) {
             bestSolution = population[0];
-            cout << "Found better solution -> " << bestSolution.cost << " current population size = " << population.size() << endl;
+            solutionTime = timer.mili();
+            if(print)
+                cout << "Found better solution -> " << bestSolution.cost << " current population size = " << population.size() << endl;
         }
         /*
          * Select individuals who can potentially mate or mutate
@@ -121,6 +125,7 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
         timer.stop();
     }
     bestSolution.printNode();
+    cout << "Solution found in " << solutionTime << endl;
 }
 
 Node GeneticAlgorithm::orderCrossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph) {

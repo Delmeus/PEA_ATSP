@@ -1,13 +1,51 @@
 #include <iostream>
+#include <filesystem>
 #include "structures/Graph.h"
 #include "algorithm/GeneticAlgorithm.h"
 
 using namespace std;
 
-int main() {
+int main(int argc, char *argv[]) {
+    /*
+     * To use with mlflow to automate
+     */
+    if(argc > 1){
+        int size = stoi(argv[2]);
+        int time = stoi(argv[4]);
+        double mutationFactor = stod(argv[6]);
+        double crossoverFactor = stod(argv[8]);
+        // fileNumber = stoi(argv[10]);
+        //int crossoverMethod = stoi(argv[12]);
+        int mutationMethod = stoi(argv[14]);
+        int target;
+        string fileName = argv[10];
+
+        bool orderCrossover;
+        if(stoi(argv[12]) == 0)
+            orderCrossover = true;
+        else
+            orderCrossover = false;
+
+        if(crossoverFactor < 0 || crossoverFactor > 1 || mutationFactor < 0 || mutationFactor > 1 || time < 0 || size < 0)
+            return 0;
+
+        Graph graph(1);
+
+        if(graph.readGraphDirectedAbsolute(fileName) !=0){
+            cerr << "Couldn't open the given file" << endl;
+            return -1;
+        }
+
+        GeneticAlgorithm::start(size, time, mutationFactor, crossoverFactor, graph, target, orderCrossover, false);
+
+        return 0;
+    }
+    /*
+     * manual tester
+     */
     int answer, time = 60, target, size = 100;
     double crossoverFactor = 0.8;
-    double mutationFactor = 0.00;
+    double mutationFactor = 0.01;
     bool orderCrossover = true;
     string fileName = "ftv47.atsp";
     target = 1776;
@@ -104,7 +142,7 @@ int main() {
                 break;
             case 9:
                 cout << endl;
-                GeneticAlgorithm::start(size, time, mutationFactor, crossoverFactor, graph, target, orderCrossover);
+                GeneticAlgorithm::start(size, time, mutationFactor, crossoverFactor, graph, target, orderCrossover, true);
                 system("PAUSE");
                 system("CLS");
                 break;
