@@ -14,12 +14,11 @@ double MINIMAL_REQUIRED_FITNESS = 0.5;
 int MAXIMAL_POPULATION_SIZE = 10000;
 
 void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool method, bool print) {
-    //int MAXIMAL_POPULATION_SIZE = graph.vertices * 200;
     vector<Node> population;
     /*
      * Initialize population
      */
-    //population.push_back(Node::greedySolution(graph));
+    population.push_back(Node::greedySolution(graph));
     while(population.size() < populationSize){
         population.push_back(Node::generateRandomNode(graph));
     }
@@ -32,7 +31,7 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
 
     random_device rd;
     mt19937 gen(rd());
-    uniform_int_distribution<> randomInt(0, graph.vertices / 2 + 1);
+    uniform_int_distribution<> randomInt(0, graph.vertices / 2 );
 
     Timer timer;
     timer.start();
@@ -59,7 +58,6 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
             else
                 break;
         }
-        cout << "population size = " << population.size() << endl;
         vector<Node> nextGeneration;
 
         for(auto element : population){
@@ -97,20 +95,14 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
                     continue;
 
                 int start = randomInt(gen);
-                randomInt = uniform_int_distribution<>(4, graph.vertices / 2);
+                randomInt = uniform_int_distribution<>(4, graph.vertices / 2 - 1);
                 int segmentLength = randomInt(gen);
-                randomInt = uniform_int_distribution<>(0, graph.vertices / 2 + 1);
+                randomInt = uniform_int_distribution<>(0, graph.vertices / 2 );
                 /*
                  * Generate first child
                  */
-
                 Node offspring = crossover(element, parent, start, segmentLength, graph, method);
-                //cout << "leave1" << endl;
                 if(hasDuplicates(offspring.chromosome)) {
-                    cout << "parents" << endl;
-                    element.printNode();
-                    parent.printNode();
-                    offspring.printNode();
                     throw std::invalid_argument("Duplicate occured");
                 }
 
@@ -120,17 +112,8 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
                 /*
                  * Generate second child
                  */
-                //cout << "enter2" << endl;
-
                 offspring = crossover(parent, element, start, segmentLength, graph, method);
-
-
-                //cout << "leave2" << endl;
                 if(hasDuplicates(offspring.chromosome)) {
-                    cout << "parents" << endl;
-                    parent.printNode();
-                    element.printNode();
-                    offspring.printNode();
                     throw std::invalid_argument("Duplicate occured");
                 }
 
@@ -141,7 +124,6 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
         }
 
         population = nextGeneration;
-        cout << "new population size = " << population.size() << endl;
         timer.stop();
     }
     bestSolution.printNode();
@@ -198,7 +180,6 @@ Node GeneticAlgorithm::orderCrossover(const Node& parent1, const Node& parent2, 
 Node GeneticAlgorithm::pmx(const Node &parent1, const Node &parent2, int start, int segmentLength, const Graph &graph) {
     Node offspring;
     int size = (int) parent1.chromosome.size();
-    //cout << "stasrt = " << start << " stop = " << start + segmentLength << endl;
     vector<int> newChromosome(size, -1);
 
     copy(parent1.chromosome.begin() + start, parent1.chromosome.begin() + start + segmentLength + 1, newChromosome.begin() + start);
@@ -206,24 +187,15 @@ Node GeneticAlgorithm::pmx(const Node &parent1, const Node &parent2, int start, 
     /*
      * Find values that are not represented in the swath from parent1
      */
-    //cout << "initialize set" << endl;
     vector<pair<int,int>> waitingForCopy;
     unordered_set<int> offspringSet(parent1.chromosome.begin() + start, parent1.chromosome.begin() + start + segmentLength + 1);
-    //cout << "elements in swath" << endl;
-    /// works fine till here
     for(int i = start; i <= start + segmentLength; i++){
-        //cout << "Checking = " << parent2.chromosome[i] << endl;
         if(offspringSet.find(parent2.chromosome[i]) != offspringSet.end()) {
-            //cout << "continuing" << endl;
             continue;
         }
         waitingForCopy.emplace_back(parent2.chromosome[i], i);
     }
-    /// chyba git
-    //cout << "elements from parent 2 waiting for copy" << endl;
-    //cout << "copy from swath" << endl;
     for(auto gene : waitingForCopy){
-        //cout << "element = " << gene.first << " index = " << gene.second << endl;
         int index = gene.second;
         /*
          * Find what value is at this place in parent1 and get
@@ -233,25 +205,18 @@ Node GeneticAlgorithm::pmx(const Node &parent1, const Node &parent2, int start, 
         while(index >= start && index < start + segmentLength + 1){
             int v = parent1.chromosome[index];
             index = getIndex(parent2.chromosome, v);
-            //cout << "szukam " << v << " znalazlem index " << index << endl;
         }
-        //cout << "ustawiam " << index << " na " << gene.first << endl;
         offspring.chromosome[index] = gene.first;
     }
     /*
      * Fill the remaining positions with values from parent2
      */
-    //cout << "fill" << endl;
     for(int i = 0; i < size; i++){
         if(offspring.chromosome[i] == -1) {
-            //cout << "uzupelniam " << i << " wartoscia = " << parent2.chromosome[i] << endl;
             offspring.chromosome[i] = parent2.chromosome[i];
         }
     }
-    //cout << "calculate cost" << endl;
     offspring.calculateCost(graph);
-    //offspring.printNode();
-    //cout << "return offspring" << endl;
     return offspring;
 }
 
