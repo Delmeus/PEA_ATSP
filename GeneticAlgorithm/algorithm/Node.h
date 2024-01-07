@@ -18,7 +18,9 @@ public:
     vector<int> chromosome;
     double fitness;
 
+    Node mutate(bool mutationMethod);
     Node scrambleMutate();
+    Node inversionMutate();
     Node selectParent(const vector<Node>& population);
     static Node greedySolution(const Graph& graph);
     static Node generateRandomNode(const Graph& graph);

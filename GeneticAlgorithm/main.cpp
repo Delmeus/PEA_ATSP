@@ -14,17 +14,20 @@ int main(int argc, char *argv[]) {
         int time = stoi(argv[4]);
         double mutationFactor = stod(argv[6]);
         double crossoverFactor = stod(argv[8]);
-        // fileNumber = stoi(argv[10]);
-        //int crossoverMethod = stoi(argv[12]);
-        int mutationMethod = stoi(argv[14]);
-        int target;
         string fileName = argv[10];
+        int target = stoi(argv[16]);
 
         bool orderCrossover;
+        bool scrambleMutate;
+
         if(stoi(argv[12]) == 0)
             orderCrossover = true;
         else
             orderCrossover = false;
+        if(stoi(argv[14]) == 0)
+            scrambleMutate = true;
+        else
+            scrambleMutate = false;
 
         if(crossoverFactor < 0 || crossoverFactor > 1 || mutationFactor < 0 || mutationFactor > 1 || time < 0 || size < 0)
             return 0;
@@ -36,7 +39,7 @@ int main(int argc, char *argv[]) {
             return -1;
         }
 
-        GeneticAlgorithm::start(size, time, mutationFactor, crossoverFactor, graph, target, orderCrossover, false);
+        GeneticAlgorithm::start(size, time, mutationFactor, crossoverFactor, graph, target, orderCrossover, scrambleMutate,false);
 
         return 0;
     }
@@ -47,23 +50,25 @@ int main(int argc, char *argv[]) {
     double crossoverFactor = 0.8;
     double mutationFactor = 0.01;
     bool orderCrossover = true;
+    bool scrambleMutate = true;
     string fileName = "ftv47.atsp";
     target = 1776;
     Graph graph(1);
     graph.readGraphDirected(fileName);
     do{
-        string method;
+        string crossoverMethod = "pmx";
+        string mutationMethod = "inversion";
         if(orderCrossover)
-            method = "order crossover";
-        else
-            method = "pmx";
+            crossoverMethod = "order crossover";
+        if(scrambleMutate)
+            mutationMethod = "scramble";
 
         system("CLS");
         cout << "--------------Genetic algorithm--------------" << endl
              << "Current settings: " << endl
              << "Time = " << time << " s, " << "target cost = " << target << ", file = " << fileName << endl
              << "Population size = " << size << ", mutation factor = " << mutationFactor << endl
-             << "Crossover factor = " << crossoverFactor << ", crossover method = " << method << endl
+             << "Crossover factor = " << crossoverFactor << ", crossover method = " << crossoverMethod << ", mutation method = " << mutationMethod << endl
              << "------------------MENU------------------" << endl
              << "1. Load graph" << endl
              << "2. Display graph" << endl
@@ -137,12 +142,15 @@ int main(int argc, char *argv[]) {
                     system("PAUSE");
                 }while(crossoverFactor <= 0 || crossoverFactor > 1);
                 break;
+            case 7:
+                scrambleMutate = !scrambleMutate;
+                break;
             case 8:
                 orderCrossover = !orderCrossover;
                 break;
             case 9:
                 cout << endl;
-                GeneticAlgorithm::start(size, time, mutationFactor, crossoverFactor, graph, target, orderCrossover, true);
+                GeneticAlgorithm::start(size, time, mutationFactor, crossoverFactor, graph, target, orderCrossover, scrambleMutate, true);
                 system("PAUSE");
                 system("CLS");
                 break;

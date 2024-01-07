@@ -145,3 +145,21 @@ int Node::findNearestNeighbour(const Graph &graph, int currentVertex, const vect
     return nearestNeighbor;
 }
 
+Node Node::mutate(bool mutationMethod) {
+    if(mutationMethod)
+        return scrambleMutate();
+    return inversionMutate();
+}
+
+Node Node::inversionMutate() {
+    int fragmentSize = (int) chromosome.size() / 10 + 2;
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> randomVertex(0, (int)chromosome.size() - fragmentSize - 1);
+    int start = randomVertex(gen);
+    Node mutatedNode;
+    mutatedNode.chromosome = this->chromosome;
+    reverse(mutatedNode.chromosome.begin() + start, mutatedNode.chromosome.begin() + start + fragmentSize);
+    return mutatedNode;
+}
+

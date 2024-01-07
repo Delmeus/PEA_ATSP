@@ -8,12 +8,13 @@
 #include "iostream"
 #include "../utils/Timer.h"
 
-int MINIMAL_AMOUNT_OF_INDIVIDUALS = 100;
+
 double ALLOW_INTO_NEXT_GENERATION_THRESHOLD = 0.8;
 double MINIMAL_REQUIRED_FITNESS = 0.5;
-int MAXIMAL_POPULATION_SIZE = 10000;
+int MAXIMAL_POPULATION_SIZE = 20000;
 
-void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool method, bool print) {
+void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool crossoverMethod, bool mutationMethod, bool print) {
+    int MINIMAL_AMOUNT_OF_INDIVIDUALS = populationSize / 2;
     vector<Node> population;
     /*
      * Initialize population
@@ -73,7 +74,7 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
             * Check if node should mutate
             */
             if(1 - value <= mutationFactor){
-                Node mutatedNode = element.scrambleMutate();
+                Node mutatedNode = element.mutate(mutationMethod);
                 mutatedNode.calculateCost(graph);
                 if(!containsNode(nextGeneration, mutatedNode)) {
                     nextGeneration.push_back(mutatedNode);
@@ -101,7 +102,7 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
                 /*
                  * Generate first child
                  */
-                Node offspring = crossover(element, parent, start, segmentLength, graph, method);
+                Node offspring = crossover(element, parent, start, segmentLength, graph, crossoverMethod);
                 if(hasDuplicates(offspring.chromosome)) {
                     throw std::invalid_argument("Duplicate occured");
                 }
@@ -112,7 +113,7 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
                 /*
                  * Generate second child
                  */
-                offspring = crossover(parent, element, start, segmentLength, graph, method);
+                offspring = crossover(parent, element, start, segmentLength, graph, crossoverMethod);
                 if(hasDuplicates(offspring.chromosome)) {
                     throw std::invalid_argument("Duplicate occured");
                 }

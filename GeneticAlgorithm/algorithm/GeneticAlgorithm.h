@@ -15,12 +15,12 @@ class GeneticAlgorithm {
 private:
     //static vector<Node> population;
 
+    static Node crossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph, bool order);
     static Node orderCrossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
     static Node pmx(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
     static void calculateFitness(vector<Node> &population);
     static bool compareByCost(const Node& a, const Node& b);
     static int getIndex(const vector<int>& v, int K);
-    static Node crossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph, bool order);
 
     static bool hasDuplicates(const std::vector<int>& vec) {
         std::unordered_set<int> uniqueValues;
@@ -41,7 +41,7 @@ private:
     static bool containsNode(const vector<Node>& nextGeneration, const Node& node);
 
 public:
-    static void start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool method, bool print);
+    static void start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool crossoverMethod, bool mutationMethod, bool print);
 };
 
 
