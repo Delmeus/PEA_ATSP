@@ -10,7 +10,7 @@
 
 
 double ALLOW_INTO_NEXT_GENERATION_THRESHOLD = 0.8;
-double MINIMAL_REQUIRED_FITNESS = 0.5;
+double MINIMAL_REQUIRED_FITNESS = 0.65;
 int MAXIMAL_POPULATION_SIZE = 20000;
 
 void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool crossoverMethod, bool mutationMethod, bool print) {
@@ -123,7 +123,6 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
                 }
             }
         }
-
         population = nextGeneration;
         timer.stop();
     }
@@ -132,7 +131,6 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
 }
 
 Node GeneticAlgorithm::orderCrossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph) {
-
     Node offspring;
     int size = (int) parent1.chromosome.size();
 
@@ -268,7 +266,93 @@ Node GeneticAlgorithm::crossover(const Node &parent1, const Node &parent2, int s
         return orderCrossover(parent1, parent2, start, segmentLength, graph);
     }
     else{
-        return pmx(parent1, parent2, start, segmentLength, graph);
+        return edgeCrossover(parent1, parent2, start, segmentLength, graph);
     }
 
+}
+
+
+Node GeneticAlgorithm::edgeCrossover(const Node &parent1, const Node &parent2, int start, int segmentLength, const Graph &graph) {
+    /*
+     * Create and fill edge table
+     */
+    vector<int> edgeTable[graph.vertices];
+    //int edgeTable[graph.vertices][4];
+    for(int i = 0; i < graph.vertices; i++){
+        int p1index = getIndex(parent1.chromosome, i);
+        int p2index = getIndex(parent2.chromosome, i);
+        edgeTable[i].push_back(parent1.getNeighbours(p1index).first);
+        edgeTable[i].push_back(parent1.getNeighbours(p1index).second);
+        edgeTable[i].push_back(parent2.getNeighbours(p2index).first);
+        edgeTable[i].push_back(parent2.getNeighbours(p2index).second);
+    }
+
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> randomInt(0, graph.vertices - 1 );
+    Node offspring;
+    int v = randomInt(gen);
+    offspring.chromosome.push_back(v);
+    while(offspring.chromosome.size() < parent1.chromosome.size()){
+        /*
+        * Remove all mentions of v
+        */
+        for (int i = 0; i < graph.vertices; i++)
+            edgeTable[i].erase(remove(edgeTable[i].begin(), edgeTable[i].end(), v), edgeTable[i].end());
+
+        bool randomlyGenerated = false;
+        if(edgeTable[v].empty()){
+
+            v = offspring.chromosome[0];
+
+            randomInt = uniform_int_distribution<>(0, graph.vertices - 1);
+            while(edgeTable[v].empty()){
+                v = randomInt(gen);
+            }
+
+//            if(edgeTable[v].empty()){
+//                cout << "znowu puste, trza wylosowac" << endl;
+//                randomInt = uniform_int_distribution<> (0, graph.vertices - 1);
+//                do{
+//                    v = randomInt(gen);
+//                } while(edgeTable[v].empty());
+//                randomlyGenerated = true;
+//            }
+        }
+
+        int previous = v;
+        map<int, int> occurrences;
+        map<int, int> lengths;
+        for (int i: edgeTable[v]) {
+            lengths[i] = (int)edgeTable[i].size();
+            if (occurrences.find(i) != occurrences.end()) {
+                occurrences[i] = 2;
+                v = i;
+                break;
+            } else
+                occurrences[i] = 1;
+
+        }
+
+        if (v == previous) {
+            int minLength = min_element(lengths.begin(), lengths.end(), [](const auto& pair1, const auto& pair2) {
+                return pair1.second < pair2.second;
+            })->second;
+            std::vector<int> minLengthElements;
+
+            for (const auto& pair : lengths) {
+                if (pair.second == minLength) {
+                    minLengthElements.push_back(pair.first);
+                }
+            }
+
+            if (!minLengthElements.empty()) {
+                randomInt = uniform_int_distribution<> (0, (int)minLengthElements.size() - 1);
+                v = minLengthElements[randomInt(gen)];
+            }
+        }
+        offspring.chromosome.push_back(v);
+    }
+    offspring.calculateCost(graph);
+    return offspring;
 }

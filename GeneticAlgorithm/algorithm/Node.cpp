@@ -8,12 +8,12 @@
 #include "iostream"
 
 Node Node::scrambleMutate() {
-    //TODO consider dynamic number of changes
-    int numberOfChanges = (int) chromosome.size() / 10 + 2;
     vector<int> positions;
     random_device rd;
     mt19937 gen(rd());
-    uniform_int_distribution<> randomVertex(0, (int) chromosome.size() - 1);
+    uniform_int_distribution<> randomVertex((int)chromosome.size() / 10 + 2, (int) chromosome.size() - 1);
+    int numberOfChanges = randomVertex(gen);
+    randomVertex = uniform_int_distribution<>(0, (int) chromosome.size() - 1);
     /*
      * Choose positions which will be changed
      */
@@ -152,14 +152,26 @@ Node Node::mutate(bool mutationMethod) {
 }
 
 Node Node::inversionMutate() {
-    int fragmentSize = (int) chromosome.size() / 10 + 2;
     random_device rd;
     mt19937 gen(rd());
-    uniform_int_distribution<> randomVertex(0, (int)chromosome.size() - fragmentSize - 1);
+    uniform_int_distribution<> randomVertex(0, (int)chromosome.size() / 2 - 1);
+    int fragmentSize = randomVertex(gen);
+    randomVertex= uniform_int_distribution<>(0, (int)chromosome.size() - fragmentSize - 1);
     int start = randomVertex(gen);
     Node mutatedNode;
     mutatedNode.chromosome = this->chromosome;
     reverse(mutatedNode.chromosome.begin() + start, mutatedNode.chromosome.begin() + start + fragmentSize);
     return mutatedNode;
+}
+
+pair<int, int> Node::getNeighbours(int index) const {
+    pair<int, int> neighbours;
+    if(index == 0)
+        neighbours = make_pair(this->chromosome[chromosome.size() - 1], this->chromosome[1]);
+    else if(index == chromosome.size() - 1)
+        neighbours = make_pair(this->chromosome[chromosome.size() - 2], this->chromosome[0]);
+    else
+        neighbours = make_pair(this->chromosome[index - 1], this->chromosome[index + 1]);
+    return neighbours;
 }
 

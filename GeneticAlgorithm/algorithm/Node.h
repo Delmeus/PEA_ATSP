@@ -24,6 +24,7 @@ public:
     Node selectParent(const vector<Node>& population);
     static Node greedySolution(const Graph& graph);
     static Node generateRandomNode(const Graph& graph);
+    pair<int, int> getNeighbours(int index) const;
     void printNode();
     void calculateCost(const Graph& graph);
 
