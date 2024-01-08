@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     /*
      * manual tester
      */
-    int answer, time = 60, target, size = 100;
+    int answer, time = 60, target, size = 1500;
     double crossoverFactor = 0.8;
     double mutationFactor = 0.01;
     bool orderCrossover = true;
@@ -56,20 +56,22 @@ int main(int argc, char *argv[]) {
     Graph graph(1);
     graph.readGraphDirected(fileName);
     do{
-        string crossoverMethod = "pmx";
-        string mutationMethod = "inversion";
+        string crossoverMethod = "edge crossover";
+        string mutationMethod = "inversion mutation";
         if(orderCrossover)
             crossoverMethod = "order crossover";
         if(scrambleMutate)
-            mutationMethod = "scramble";
+            mutationMethod = "scramble mutation";
 
         system("CLS");
         cout << "--------------Genetic algorithm--------------" << endl
              << "Current settings: " << endl
-             << "Time = " << time << " s, " << "target cost = " << target << ", file = " << fileName << endl
-             << "Population size = " << size << ", mutation factor = " << mutationFactor << endl
-             << "Crossover factor = " << crossoverFactor << ", crossover method = " << crossoverMethod << ", mutation method = " << mutationMethod << endl
-             << "------------------MENU------------------" << endl
+             << "time = " << time << " s, " << "target cost = " << target <<  endl
+             << "file = " << fileName << ", population size = " << size << endl
+             << "mutation factor = " << mutationFactor << ", crossover factor = " << crossoverFactor << endl
+             << "crossover method = " << crossoverMethod <<  endl
+             << "mutation method = " << mutationMethod << endl
+             << "--------------------MENU--------------------" << endl
              << "1. Load graph" << endl
              << "2. Display graph" << endl
              << "3. Change stop condition" << endl

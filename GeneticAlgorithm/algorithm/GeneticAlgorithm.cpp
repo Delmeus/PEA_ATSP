@@ -9,12 +9,12 @@
 #include "../utils/Timer.h"
 
 
-double ALLOW_INTO_NEXT_GENERATION_THRESHOLD = 0.8;
-double MINIMAL_REQUIRED_FITNESS = 0.65;
-int MAXIMAL_POPULATION_SIZE = 20000;
+double ALLOW_INTO_NEXT_GENERATION_THRESHOLD = 0.95;
+double MINIMAL_REQUIRED_FITNESS = 0.7;
+int MAXIMAL_POPULATION_SIZE = 10000;
 
 void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool crossoverMethod, bool mutationMethod, bool print) {
-    int MINIMAL_AMOUNT_OF_INDIVIDUALS = populationSize / 2;
+    int MINIMAL_AMOUNT_OF_INDIVIDUALS = populationSize / 4;
     vector<Node> population;
     /*
      * Initialize population
@@ -59,8 +59,8 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
             else
                 break;
         }
-        vector<Node> nextGeneration;
 
+        vector<Node> nextGeneration;
         for(auto element : population){
             /*
              * Let the best solutions go to the next generation
@@ -176,7 +176,7 @@ Node GeneticAlgorithm::orderCrossover(const Node& parent1, const Node& parent2, 
     return offspring;
 }
 
-Node GeneticAlgorithm::pmx(const Node &parent1, const Node &parent2, int start, int segmentLength, const Graph &graph) {
+[[maybe_unused]] Node GeneticAlgorithm::pmx(const Node &parent1, const Node &parent2, int start, int segmentLength, const Graph &graph) {
     Node offspring;
     int size = (int) parent1.chromosome.size();
     vector<int> newChromosome(size, -1);
@@ -277,7 +277,6 @@ Node GeneticAlgorithm::edgeCrossover(const Node &parent1, const Node &parent2, i
      * Create and fill edge table
      */
     vector<int> edgeTable[graph.vertices];
-    //int edgeTable[graph.vertices][4];
     for(int i = 0; i < graph.vertices; i++){
         int p1index = getIndex(parent1.chromosome, i);
         int p2index = getIndex(parent2.chromosome, i);
@@ -299,8 +298,6 @@ Node GeneticAlgorithm::edgeCrossover(const Node &parent1, const Node &parent2, i
         */
         for (int i = 0; i < graph.vertices; i++)
             edgeTable[i].erase(remove(edgeTable[i].begin(), edgeTable[i].end(), v), edgeTable[i].end());
-
-        bool randomlyGenerated = false;
         if(edgeTable[v].empty()){
 
             v = offspring.chromosome[0];
@@ -310,14 +307,6 @@ Node GeneticAlgorithm::edgeCrossover(const Node &parent1, const Node &parent2, i
                 v = randomInt(gen);
             }
 
-//            if(edgeTable[v].empty()){
-//                cout << "znowu puste, trza wylosowac" << endl;
-//                randomInt = uniform_int_distribution<> (0, graph.vertices - 1);
-//                do{
-//                    v = randomInt(gen);
-//                } while(edgeTable[v].empty());
-//                randomlyGenerated = true;
-//            }
         }
 
         int previous = v;

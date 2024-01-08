@@ -17,7 +17,8 @@ private:
 
     static Node crossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph, bool order);
     static Node orderCrossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
-    static Node pmx(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
+
+    [[maybe_unused]] static Node pmx(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
     static Node edgeCrossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
     static void calculateFitness(vector<Node> &population);
     static bool compareByCost(const Node& a, const Node& b);
@@ -29,14 +30,13 @@ private:
         for (int value : vec) {
             if(value == -1)
                 continue;
-            // If the value is already in the set, it's a duplicate
             if (!uniqueValues.insert(value).second) {
                 cout << "duplicate:" << value << endl;
-                return true; // Duplicate found
+                return true;
             }
         }
 
-        return false; // No duplicates found
+        return false;
     }
 
     static bool containsNode(const vector<Node>& nextGeneration, const Node& node);

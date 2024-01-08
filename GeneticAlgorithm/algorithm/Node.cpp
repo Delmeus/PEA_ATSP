@@ -120,10 +120,13 @@ Node Node::selectParent(const vector<Node>& population) {
     std::uniform_real_distribution<> distribution(0.0, totalFitness);
     double randomValue = distribution(gen);
     double cumulativeFitness = 0.0;
-
     for (const auto& node : population) {
         cumulativeFitness += node.fitness;
-        if (cumulativeFitness >= randomValue && equal(node.chromosome.begin(), node.chromosome.end(), chromosome.begin())) {
+        /*
+         * To make nodes with higher fitness more likely to be parents
+         */
+        double selectionThreshold = std::uniform_real_distribution<>(0.001, 0.4)(gen);
+        if (cumulativeFitness >= randomValue * selectionThreshold && !equal(node.chromosome.begin(), node.chromosome.end(), chromosome.begin())) {
             return node;
         }
     }
