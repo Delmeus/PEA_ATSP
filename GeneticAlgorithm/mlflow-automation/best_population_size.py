@@ -8,13 +8,6 @@ import numpy as np
 import pandas as pd
 import statistics
 
-# def run_test(test_num, parameters, iteration):
-#     with mlflow.start_run(run_name=f"100x0.8x0.01{test_num + iteration}"):
-#         result = run_atsp(parameters)
-#         mlflow.log_params(parameters)
-#         mlflow.log_param("path", result[0])
-#         mlflow.log_metric("cost", float(result[1]))
-#         mlflow.log_metric("time", float(result[2]))
 
 def run_experiment(parameters, iteration):
     with mlflow.start_run(
@@ -29,19 +22,6 @@ def run_experiment(parameters, iteration):
         print("cost = {}, path = {}".format(cost, path))
         return cost, time
 
-
-# def run_simulations(parameters, num_simulations_per_set):
-#     costs_list = []
-#     times_list = []
-#
-#     with concurrent.futures.ThreadPoolExecutor() as executor:
-#         futures = [executor.submit(run_experiment, parameters, iteration) for iteration in range(num_simulations_per_set)]
-#         for future in concurrent.futures.as_completed(futures):
-#             cost, time = future.result()
-#             costs_list.append(cost)
-#             times_list.append(time)
-#
-#     return costs_list, times_list
 
 def run_simulations(parameters, num_simulations_per_set):
     costs = []
@@ -64,57 +44,12 @@ def run_simulations(parameters, num_simulations_per_set):
     return costs, times
 
 
-if __name__ == "__main__":
+def start_test(parameters, filename):
 
-    filename = "ftv47"
     experiment_name = f"{filename}_population"
     mlflow.set_experiment(experiment_name)
     if mlflow.get_experiment_by_name(experiment_name) is None:
         mlflow.create_experiment(experiment_name)
-
-    # define parameters for algorithm
-    parameters_small = [
-        # order crossover and scramble mutate
-        {"population size": 500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 0, "mutation method": 0, "target": 1776},
-        {"population size": 1500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 0, "mutation method": 0, "target": 1776},
-        {"population size": 2500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 0, "mutation method": 0, "target": 1776},
-        # order crossover and inversion mutate
-        {"population size": 500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 0, "mutation method": 1, "target": 1776},
-        {"population size": 1500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 0, "mutation method": 1, "target": 1776},
-        {"population size": 2500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 0, "mutation method": 1, "target": 1776},
-        # pmx and scramble mutate
-        {"population size": 500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 1, "mutation method": 0, "target": 1776},
-        {"population size": 1500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 1, "mutation method": 0, "target": 1776},
-        {"population size": 2500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 1, "mutation method": 0, "target": 1776},
-        # pmx and inversion mutate
-        {"population size": 500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 1, "mutation method": 1, "target": 1776},
-        {"population size": 1500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 1, "mutation method": 1, "target": 1776},
-        {"population size": 2500, "time": 1, "mutation factor": 0.01, "crossover factor": 0.8,
-         "file": f"G:\\Projekty_Studia\\PEA_ATSP\\GeneticAlgorithm\\input\\{filename}.atsp",
-         "crossover method": 1, "mutation method": 1, "target": 1776}
-    ]
 
     mutation_crossover_combinations = [
         {"mutation_method": "s", "crossover_method": "ox"},
@@ -128,10 +63,10 @@ if __name__ == "__main__":
     all_times = []
     legend_labels = []
     # run algorithm for all parameters
-    for parameter in parameters_small:
+    for parameter in parameters:
         costs = []
         times = []
-        print("Next population size = {}".format([parameter["population size"]]))
+        print("Next population size = {}, crossover = {}, mutation = {}".format([parameter["population size"]], [parameter["crossover method"]], [parameter["mutation method"]]))
         for i in range(2):
             cost, time = (run_simulations(parameter, num_simulations_per_set))
             cost.sort()
@@ -151,32 +86,32 @@ if __name__ == "__main__":
         all_times.append(times)
 
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[0],
-             linestyle='-', color='r', label=f'{parameters_small[0]["population size"]}_s_ox')
+             linestyle='-', color='r', label=f'{parameters[0]["population size"]}_s_ox')
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[1],
-             linestyle='--', color='r', label=f'{parameters_small[1]["population size"]}_s_ox')
+             linestyle='--', color='r', label=f'{parameters[1]["population size"]}_s_ox')
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[2],
-             linestyle='-.', color='r', label=f'{parameters_small[2]["population size"]}_s_ox')
+             linestyle='-.', color='r', label=f'{parameters[2]["population size"]}_s_ox')
 
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[3],
-             linestyle='-', color='b', label=f'{parameters_small[3]["population size"]}_i_ox')
+             linestyle='-', color='b', label=f'{parameters[3]["population size"]}_i_ox')
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[4],
-             linestyle='--', color='b', label=f'{parameters_small[4]["population size"]}_i_ox')
+             linestyle='--', color='b', label=f'{parameters[4]["population size"]}_i_ox')
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[5],
-             linestyle='-.', color='b', label=f'{parameters_small[5]["population size"]}_i_ox')
+             linestyle='-.', color='b', label=f'{parameters[5]["population size"]}_i_ox')
 
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[6],
-             linestyle='-', color='g', label=f'{parameters_small[6]["population size"]}_s_ex')
+             linestyle='-', color='g', label=f'{parameters[6]["population size"]}_s_ex')
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[7],
-             linestyle='--', color='g', label=f'{parameters_small[7]["population size"]}_s_ex')
+             linestyle='--', color='g', label=f'{parameters[7]["population size"]}_s_ex')
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[8],
-             linestyle='-.', color='g', label=f'{parameters_small[8]["population size"]}_s_ex')
+             linestyle='-.', color='g', label=f'{parameters[8]["population size"]}_s_ex')
 
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[9],
-             linestyle='-', color='k', label=f'{parameters_small[9]["population size"]}_i_ex')
+             linestyle='-', color='k', label=f'{parameters[9]["population size"]}_i_ex')
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[10],
-             linestyle='--', color='k', label=f'{parameters_small[10]["population size"]}_i_ex')
+             linestyle='--', color='k', label=f'{parameters[10]["population size"]}_i_ex')
     plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[11],
-             linestyle='-.', color='k', label=f'{parameters_small[11]["population size"]}_i_ex')
+             linestyle='-.', color='k', label=f'{parameters[11]["population size"]}_i_ex')
 
     plt.legend()
     plt.xlabel("Pomiar")
@@ -204,7 +139,7 @@ if __name__ == "__main__":
                                 ])
 
     print(table)
-    table.to_csv(f'{filename}_best_pop.csv', index=False)
+    table.to_csv(f'{filename}_best_pop.csv', index=True, sep=';', decimal=',')
 
 
 
