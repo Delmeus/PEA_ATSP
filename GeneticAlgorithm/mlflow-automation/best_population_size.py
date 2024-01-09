@@ -58,7 +58,7 @@ def start_test(parameters, filename):
         {"mutation_method": "i", "crossover_method": "ex"}
     ]
 
-    num_simulations_per_set = 5
+    num_simulations_per_set = 3
     all_costs = []
     all_times = []
     legend_labels = []
@@ -67,7 +67,7 @@ def start_test(parameters, filename):
         costs = []
         times = []
         print("Next population size = {}, crossover = {}, mutation = {}".format([parameter["population size"]], [parameter["crossover method"]], [parameter["mutation method"]]))
-        for i in range(2):
+        for i in range(3):
             cost, time = (run_simulations(parameter, num_simulations_per_set))
             cost.sort()
             time.sort()
@@ -85,32 +85,36 @@ def start_test(parameters, filename):
         all_costs.append(costs)
         all_times.append(times)
 
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[0],
+    numbers = []
+    for i in range(1, len(all_costs[0]) + 1):
+        numbers.append(i)
+
+    plt.plot(np.array(numbers), np.array(all_costs)[0],
              linestyle='-', color='r', label=f'{parameters[0]["population size"]}_s_ox')
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[1],
+    plt.plot(np.array(numbers), np.array(all_costs)[1],
              linestyle='--', color='r', label=f'{parameters[1]["population size"]}_s_ox')
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[2],
+    plt.plot(np.array(numbers), np.array(all_costs)[2],
              linestyle='-.', color='r', label=f'{parameters[2]["population size"]}_s_ox')
 
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[3],
+    plt.plot(np.array(numbers), np.array(all_costs)[3],
              linestyle='-', color='b', label=f'{parameters[3]["population size"]}_i_ox')
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[4],
+    plt.plot(np.array(numbers), np.array(all_costs)[4],
              linestyle='--', color='b', label=f'{parameters[4]["population size"]}_i_ox')
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[5],
+    plt.plot(np.array(numbers), np.array(all_costs)[5],
              linestyle='-.', color='b', label=f'{parameters[5]["population size"]}_i_ox')
 
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[6],
+    plt.plot(np.array(numbers), np.array(all_costs)[6],
              linestyle='-', color='g', label=f'{parameters[6]["population size"]}_s_ex')
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[7],
+    plt.plot(np.array(numbers), np.array(all_costs)[7],
              linestyle='--', color='g', label=f'{parameters[7]["population size"]}_s_ex')
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[8],
+    plt.plot(np.array(numbers), np.array(all_costs)[8],
              linestyle='-.', color='g', label=f'{parameters[8]["population size"]}_s_ex')
 
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[9],
+    plt.plot(np.array(numbers), np.array(all_costs)[9],
              linestyle='-', color='k', label=f'{parameters[9]["population size"]}_i_ex')
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[10],
+    plt.plot(np.array(numbers), np.array(all_costs)[10],
              linestyle='--', color='k', label=f'{parameters[10]["population size"]}_i_ex')
-    plt.plot(np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), np.array(all_costs)[11],
+    plt.plot(np.array(numbers), np.array(all_costs)[11],
              linestyle='-.', color='k', label=f'{parameters[11]["population size"]}_i_ex')
 
     plt.legend()
