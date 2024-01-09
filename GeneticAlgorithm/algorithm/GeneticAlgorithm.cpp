@@ -11,10 +11,10 @@
 
 double ALLOW_INTO_NEXT_GENERATION_THRESHOLD = 0.95;
 double MINIMAL_REQUIRED_FITNESS = 0.7;
-int MAXIMAL_POPULATION_SIZE = 10000;
+int MAXIMAL_POPULATION_SIZE = 5000;
+int MINIMAL_AMOUNT_OF_INDIVIDUALS = 100;
 
 void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool crossoverMethod, bool mutationMethod, bool print) {
-    int MINIMAL_AMOUNT_OF_INDIVIDUALS = populationSize / 4;
     vector<Node> population;
     /*
      * Initialize population
@@ -103,9 +103,6 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
                  * Generate first child
                  */
                 Node offspring = crossover(element, parent, start, segmentLength, graph, crossoverMethod);
-                if(hasDuplicates(offspring.chromosome)) {
-                    throw std::invalid_argument("Duplicate occured");
-                }
 
                 if(!containsNode(nextGeneration, offspring)) {
                     nextGeneration.push_back(offspring);
@@ -114,9 +111,6 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
                  * Generate second child
                  */
                 offspring = crossover(parent, element, start, segmentLength, graph, crossoverMethod);
-                if(hasDuplicates(offspring.chromosome)) {
-                    throw std::invalid_argument("Duplicate occured");
-                }
 
                 if(!containsNode(nextGeneration, offspring)) {
                     nextGeneration.push_back(offspring);

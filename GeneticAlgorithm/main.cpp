@@ -123,10 +123,10 @@ int main(int argc, char *argv[]) {
             case 4:
                 do{
                     system("CLS");
-                    cout << "How large do you want the starting population to be: ";
+                    cout << "How large do you want the starting population to be (must be higher than 100): ";
                     cin >> size;
                     system("PAUSE");
-                }while(size < 2);
+                }while(size < 100);
                 break;
             case 5:
                 do {
