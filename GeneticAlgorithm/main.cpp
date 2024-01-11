@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     Graph graph(1);
     graph.readGraphDirected(fileName);
     do{
-        string crossoverMethod = "edge crossover";
+        string crossoverMethod = "pmx";
         string mutationMethod = "inversion mutation";
         if(orderCrossover)
             crossoverMethod = "order crossover";

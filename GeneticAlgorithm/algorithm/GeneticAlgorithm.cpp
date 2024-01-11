@@ -260,7 +260,7 @@ Node GeneticAlgorithm::crossover(const Node &parent1, const Node &parent2, int s
         return orderCrossover(parent1, parent2, start, segmentLength, graph);
     }
     else{
-        return edgeCrossover(parent1, parent2, start, segmentLength, graph);
+        return pmx(parent1, parent2, start, segmentLength, graph);
     }
 
 }
