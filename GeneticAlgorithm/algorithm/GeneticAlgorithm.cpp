@@ -11,7 +11,6 @@
 
 double ALLOW_INTO_NEXT_GENERATION_THRESHOLD = 0.95;
 double MINIMAL_REQUIRED_FITNESS = 0.7;
-int MAXIMAL_POPULATION_SIZE = 5000;
 int MINIMAL_AMOUNT_OF_INDIVIDUALS = 100;
 
 void GeneticAlgorithm::start(int populationSize, long stopCondition, double mutationFactor, double crossoverFactor, const Graph& graph, int target, bool crossoverMethod, bool mutationMethod, bool print) {
@@ -53,7 +52,7 @@ void GeneticAlgorithm::start(int populationSize, long stopCondition, double muta
          * Select individuals who can potentially mate or mutate
          */
         for(int i = (int) population.size(); i >= 0; i--){
-            if((population[i].fitness < MINIMAL_REQUIRED_FITNESS && i > MINIMAL_AMOUNT_OF_INDIVIDUALS * 2) || i > MAXIMAL_POPULATION_SIZE){
+            if((population[i].fitness < MINIMAL_REQUIRED_FITNESS && i > MINIMAL_AMOUNT_OF_INDIVIDUALS * 2) || i > populationSize){
                 population.pop_back();
             }
             else
@@ -170,7 +169,7 @@ Node GeneticAlgorithm::orderCrossover(const Node& parent1, const Node& parent2, 
     return offspring;
 }
 
-[[maybe_unused]] Node GeneticAlgorithm::pmx(const Node &parent1, const Node &parent2, int start, int segmentLength, const Graph &graph) {
+Node GeneticAlgorithm::pmx(const Node &parent1, const Node &parent2, int start, int segmentLength, const Graph &graph) {
     Node offspring;
     int size = (int) parent1.chromosome.size();
     vector<int> newChromosome(size, -1);

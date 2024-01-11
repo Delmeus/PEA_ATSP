@@ -12,7 +12,7 @@ def parse_results(output):
 
 def run_atsp(parameters):
 
-    command = ["C:/Users/antek/Desktop/studia/5.sem/Pea sprawka i wyniki/PEA_ATSP/GeneticAlgorithm/cmake-build-release/GeneticAlgorithm.exe", "--param1",
+    command = ["G:/Projekty_Studia/PEA_ATSP/GeneticAlgorithm/cmake-build-release/GeneticAlgorithm.exe", "--param1",
                str(parameters["population size"]), "--param2", str(parameters["time"]), "--param3", str(parameters["mutation factor"]),
                "--param4", str(parameters["crossover factor"]), "--param5", str(parameters["file"]), "--param6",
                str(parameters["crossover method"]), "--param7", str(parameters["mutation method"]),

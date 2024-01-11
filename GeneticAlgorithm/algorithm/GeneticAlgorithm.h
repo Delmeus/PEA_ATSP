@@ -18,8 +18,8 @@ private:
     static Node crossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph, bool order);
     static Node orderCrossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
 
-    [[maybe_unused]] static Node pmx(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
-    static Node edgeCrossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
+    static Node pmx(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
+    [[maybe_unused]] static Node edgeCrossover(const Node& parent1, const Node& parent2, int start, int segmentLength, const Graph& graph);
     static void calculateFitness(vector<Node> &population);
     static bool compareByCost(const Node& a, const Node& b);
     static int getIndex(const vector<int>& v, int K);
